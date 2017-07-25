@@ -1,7 +1,5 @@
 package kamisado_server;
 
-import java.util.ArrayList;
-
 public class Kamisado_Server_Model {
 	final int boardSize = 7;
 	FieldColor[][] gameboard = new FieldColor[boardSize][boardSize];

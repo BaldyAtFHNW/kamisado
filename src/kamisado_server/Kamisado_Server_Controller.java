@@ -14,7 +14,6 @@ public class Kamisado_Server_Controller {
 		//Wait for 2. player
 		//Create Connection Threads for 2. Player
 		
-		
 	};
 	
 }
