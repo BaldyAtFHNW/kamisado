@@ -1,9 +1,10 @@
 package kamisado_client;
 
-import javafx.*;
 import javafx.application.Application;
+import javafx.stage.Stage;
 
 public class Kamisado_Client_Main extends Application {
+	private Kamisado_Client_Model model;
 	private Kamisado_Client_View view;
 	private Kamisado_Client_Controller controller;
 	
@@ -15,8 +16,9 @@ public class Kamisado_Client_Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage){
-		view = new Kamisado_Client_View(primaryStage);
-		controller = new Kamisado_Client_Congroller(view);
+		model = new Kamisado_Client_Model();
+		view = new Kamisado_Client_View(primaryStage, model);
+		controller = new Kamisado_Client_Controller(model, view);
 		view.start();
 	}
 
