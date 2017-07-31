@@ -5,39 +5,59 @@ import org.json.simple.JSONObject;
 
 
 public class JSONDummie {
+	
+	/*
+	Hey Liz
+	This is the DummieClass I told you about
+	Put an observer on the variable obj just below and simulate a server response 
+	by calling one of the methods below (they then fill the obj variable)
+	
+	In case you'd like to try it, I've put a little test into "Kamisado_Client_Main"
+	It creates this dummie and reads out the JSON-Object for "requestMove"
+	
+	Don't forget to call clearJSONObject() if you'd like to simulate several communications after each other
+	*/
+	
+	
 	private JSONObject obj;
 	
 	public JSONDummie(){
-	
-		obj = new JSONObject();
-		obj.put("name", "Simon");
-		obj.put("location", "Itingen");
-		
-		JSONArray list = new JSONArray();
-		list.add("something");
-		list.add("somethign2");
-		list.add("somtehing3");
-	
+		this.obj = new JSONObject();
 	}
 	
-	public JSONObject simulateInit(){
+	public JSONObject getJSONObject(){
+		return this.obj;
+	}
+	
+	public void clearJSONObject(){
+		this.obj.clear();
+	}
+	
+	
+	
+	
+	
+	//Different Methods for filling the Object from here:
+	
+	@SuppressWarnings("unchecked")
+	public void simulateInit(){
 		obj.put("type", "init");
 		obj.put("black", true);
 		obj.put("start", true);
-		
-		return new JSONObject();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public JSONObject simulateMove(){
 		obj.put("type", "move");
 		obj.put("towerColor", "WBLUE");
 		obj.put("xPos", 6);
 		obj.put("yPos", 5);
 		
-		return new JSONObject();
+		return obj;
 	}
 	
-	public JSONObject simulateRequestMove(){
+	@SuppressWarnings("unchecked")
+	public void simulateRequestMove(){
 		obj.put("type", "requestMove");
 		obj.put("movedTower", "WYellow");
 		obj.put("xPos", 4);
@@ -67,22 +87,18 @@ public class JSONDummie {
 		possibleMoves.add(d);
 		
 		obj.put("possibleMoves", possibleMoves);
-		
-		return new JSONObject();
 	}
 	
-	public JSONObject simulateEnd(){
+	@SuppressWarnings("unchecked")
+	public void simulateEnd(){
 		obj.put("type", "end");
 		obj.put("won", true);
 		obj.put("reason", "surrender");
-		
-		return new JSONObject();
 	}
 	
-	public JSONObject simulateReset(){
+	@SuppressWarnings("unchecked")
+	public void simulateReset(){
 		obj.put("type", "reset");
 		obj.put("confirmed", false);
-		
-		return new JSONObject();
 	}
 }
