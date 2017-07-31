@@ -10,6 +10,11 @@ public class Kamisado_Client_Controller {
 		this.model = model;
 		this.view = view;
 		
+		
+		
+		
+		
+		
 		// Example how to register for View events
 		view.btnClick.setOnAction((event) -> {
 			//Do Stuff
