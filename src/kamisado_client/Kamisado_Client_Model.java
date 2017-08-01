@@ -1,9 +1,43 @@
 package kamisado_client;
 
-public class Kamisado_Client_Model {
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.util.logging.Logger;
 
-	//Hi Liza
-	//I created a model anyway, in case you should need it
-	//(maybe for the numbercrunching for the black player or something...)
+public class Kamisado_Client_Model {
+	final private String ipAddress = "127.0.0.1";
+	final private int port = 50000;
+	private Logger logger = Logger.getLogger("");
+	private Socket serverSocket;
+	public String message;
 	
+	
+	
+	public void connectServer(){
+		try{
+			this.serverSocket = new Socket(ipAddress, port);
+		}catch(Exception e){
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+		
+		Kamisado_Client_ServerThread server = new Kamisado_Client_ServerThread(Kamisado_Client_Model.this, serverSocket);
+		new Thread(server).start();
+	}
+	
+	
+	
+	public void send(String msg){
+		OutputStreamWriter out;
+		try{
+			logger.info(this.serverSocket.toString());
+			out = new OutputStreamWriter(this.serverSocket.getOutputStream());
+			out.write(msg + '\n');
+			out.flush();
+		}catch(Exception e){
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+	}
+
 }

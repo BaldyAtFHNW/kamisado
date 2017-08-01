@@ -1,12 +1,55 @@
 package kamisado_server;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.logging.Logger;
+
 public class Kamisado_Server_Model {
+	Logger logger = Logger.getLogger("");
+	
 	final int boardSize = 7;
 	FieldColor[][] gameboard = new FieldColor[boardSize][boardSize];
 	TowerColor[][] towerPositions = new TowerColor[boardSize][boardSize];
 	
+	private Socket socketPlayer1;
+	private Socket socketPlayer2;
+	
+	public String msgPlayer1;
+	public String msgPlayer2;
+	
 	public Kamisado_Server_Model(){
-		
+		//empty constructor can be deleted if not needed in the end
+	}
+	
+	public void connectClients(){
+
+		try{
+			ServerSocket listener = new ServerSocket(50000, 10, null);
+			this.socketPlayer1 = listener.accept();
+			logger.info("Player1 connected");
+			Kamisado_Server_ClientThread clientPlayer1 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer1, 1);
+			new Thread(clientPlayer1).start();
+			
+			this.socketPlayer2 = listener.accept();
+			logger.info("Player2 connected");
+			Kamisado_Server_ClientThread clientPlayer2 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer2, 2);
+			new Thread(clientPlayer2).start();
+			
+			
+		}catch(Exception e){
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+	
+	}
+
+	public void send(String msg, boolean player1){
+		if(player1){
+			//send msg to player 1
+		}else{
+			//send msg to player 2
+		}
 	}
 	
 	public void initTowers(){
