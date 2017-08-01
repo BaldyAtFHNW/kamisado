@@ -12,7 +12,6 @@ public class Kamisado_Client_Model {
 	public String message;
 	
 	
-	
 	public void connectServer(){
 		try{
 			this.serverSocket = new Socket(ipAddress, port);
@@ -30,7 +29,7 @@ public class Kamisado_Client_Model {
 	public void send(String msg){
 		OutputStreamWriter out;
 		try{
-			logger.info(this.serverSocket.toString());
+			//logger.info(this.serverSocket.toString());
 			out = new OutputStreamWriter(this.serverSocket.getOutputStream());
 			out.write(msg + '\n');
 			out.flush();

@@ -1,11 +1,11 @@
 package kamisado_server;
 
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
-public class Kamisado_Server_Model {
+public class Kamisado_Server_Model{
 	Logger logger = Logger.getLogger("");
 	
 	final int boardSize = 7;
@@ -15,8 +15,14 @@ public class Kamisado_Server_Model {
 	private Socket socketPlayer1;
 	private Socket socketPlayer2;
 	
-	public String msgPlayer1;
-	public String msgPlayer2;
+	
+	private ArrayList<String> msgsPlayer1 = new ArrayList<String>();
+	private ArrayList<String> msgsPlayer2 = new ArrayList<String>();
+	
+	/*private String msgPlayer1 = "";
+	//private SimpleStringProperty msgPlayer1;
+	private String msgPlayer2 = "";
+	//private SimpleStringProperty msgPlayer2;*/
 	
 	public Kamisado_Server_Model(){
 		//empty constructor can be deleted if not needed in the end
@@ -28,20 +34,65 @@ public class Kamisado_Server_Model {
 			ServerSocket listener = new ServerSocket(50000, 10, null);
 			this.socketPlayer1 = listener.accept();
 			logger.info("Player1 connected");
-			Kamisado_Server_ClientThread clientPlayer1 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer1, 1);
+			Kamisado_Server_ClientThread clientPlayer1 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer1, true);
 			new Thread(clientPlayer1).start();
 			
 			this.socketPlayer2 = listener.accept();
 			logger.info("Player2 connected");
-			Kamisado_Server_ClientThread clientPlayer2 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer2, 2);
+			Kamisado_Server_ClientThread clientPlayer2 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer2, false);
 			new Thread(clientPlayer2).start();
 			
+			listener.close();
 			
 		}catch(Exception e){
 			logger.warning(e.toString());
 			e.printStackTrace();
 		}
 	
+	}
+	
+	public void newMessagePlayer1(String msg){
+		this.msgsPlayer1.add(msg);
+	}
+	
+	public void newMessagePlayer2(String msg){
+		this.msgsPlayer2.add(msg);
+	}
+	
+	public String getMsgPlayer1(){
+		if (msgsPlayer1.size() == 0){
+			return null;
+		}else{
+			String msg = msgsPlayer1.get(0);
+			msgsPlayer1.remove(0);
+			return msg;
+		}
+	}
+	
+	public String getMsgPlayer2(){
+		if (msgsPlayer2.size() == 0){
+			return null;
+		}else{
+			String msg = msgsPlayer2.get(0);
+			msgsPlayer2.remove(0);
+			return msg;
+		}
+	}
+	
+	public boolean msgPendingPlayer1(){
+		if (msgsPlayer1.size() == 0){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	public boolean msgPendingPlayer2(){
+		if (msgsPlayer2.size() == 0){
+			return false;
+		}else{
+			return true;
+		}
 	}
 
 	public void send(String msg, boolean player1){
@@ -147,5 +198,7 @@ public class Kamisado_Server_Model {
 		this.gameboard[6][7] = FieldColor.GREEN;
 		this.gameboard[7][7] = FieldColor.BROWN;
 	}
+
+
 	
 }
