@@ -31,19 +31,12 @@ public class Kamisado_Server_Model{
 			this.socketPlayer1 = listener.accept();
 			logger.info("Player1 connected");
 			Kamisado_Server_ClientThread clientPlayer1 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer1, true);
-			new Thread(clientPlayer1).start();
-			
-			logger.info(socketPlayer1.isConnected() ? "Connected" : "Not Connected");
-			logger.info(socketPlayer1.isBound() ? "Bound" : "Not Bound");
-			
+			new Thread(clientPlayer1).start();			
 			
 			this.socketPlayer2 = listener.accept();
 			logger.info("Player2 connected");
 			Kamisado_Server_ClientThread clientPlayer2 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer2, false);
 			new Thread(clientPlayer2).start();
-			
-			logger.info(socketPlayer2.isConnected() ? "Connected" : "Not Connected");
-			logger.info(socketPlayer2.isBound() ? "Bound" : "Not Bound");
 			
 			listener.close();
 			

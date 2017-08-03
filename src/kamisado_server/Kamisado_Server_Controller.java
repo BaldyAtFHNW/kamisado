@@ -15,11 +15,11 @@ public class Kamisado_Server_Controller{
 		model.initTowers();
 
 		
-		model.sendToPl1("To Player 1");
+		/*model.sendToPl1("To Player 1");
 		model.sendToPl2("To Player 2");
 		
 		model.sendToPl1("To Player 1, again");
-		model.sendToPl2("To Player 2, again");
+		model.sendToPl2("To Player 2, again");*/
 		
 		//init the game and afterwards only react
 
