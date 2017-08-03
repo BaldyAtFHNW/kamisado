@@ -26,6 +26,7 @@ public class Kamisado_Client_Model {
 		
 		logger.info(serverSocket.isConnected() ? "Connected" : "Not Connected");
 		logger.info(serverSocket.isBound() ? "Bound" : "Not Bound");
+		
 	}
 	
 	public String getSocketStatus(){
@@ -33,10 +34,12 @@ public class Kamisado_Client_Model {
 	}
 	
 	public void newMessage(String msg){
+		logger.info("RECEIVED SOMETHING");
 		this.msgsServer.add(msg);
 	}
 	
 	public String getMsgServer(){
+		
 		if(msgsServer.size() == 0){
 			return null;
 		}else{

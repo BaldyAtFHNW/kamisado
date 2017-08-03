@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 public class Kamisado_Server_Controller{
 	private Logger logger = Logger.getLogger("");
-	Kamisado_Server_Model model;
+	private Kamisado_Server_Model model;
 	
 	public Kamisado_Server_Controller(Kamisado_Server_Model model){
 		this.model = model;
@@ -13,11 +13,7 @@ public class Kamisado_Server_Controller{
 		model.connectClients();
 		model.initGameBoard();
 		model.initTowers();
-		
-		int i = 0;
-		while(i<1000000){
-			i++;
-		}
+
 		
 		model.sendToPl1("To Player 1");
 		model.sendToPl2("To Player 2");

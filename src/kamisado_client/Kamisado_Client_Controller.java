@@ -8,8 +8,8 @@ import javafx.application.Platform;
 
 public class Kamisado_Client_Controller {
 	private Logger logger = Logger.getLogger("");
-	final private Kamisado_Client_Model model;
-	final private Kamisado_Client_View view;
+	private Kamisado_Client_Model model;
+	private Kamisado_Client_View view;
 	
 	
 	protected Kamisado_Client_Controller(Kamisado_Client_Model model, Kamisado_Client_View view){
