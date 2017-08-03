@@ -25,7 +25,7 @@ public class Kamisado_Client_ServerThread implements Runnable{
 			in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 			while(true){
 				msg = in.readLine();
-				model.message = msg;
+				model.newMessage(msg);
 			}
 		}catch(Exception e){
 			logger.warning(e.toString());

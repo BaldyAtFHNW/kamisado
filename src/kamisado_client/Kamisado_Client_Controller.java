@@ -18,15 +18,8 @@ public class Kamisado_Client_Controller {
 		
 		model.connectServer();
 		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
+		logger.info(model.getSocketStatus());
+
 		
 		// Example how to register for View events
 		view.btnClick.setOnAction((event) -> {
@@ -37,10 +30,19 @@ public class Kamisado_Client_Controller {
 			view.stop();
 			Platform.exit();
 		});
+		
+		while(true){
+			processServerMessage();
+		}
+		
 	}
 	
 
-	
+	private void processServerMessage(){
+		if(model.msgPendingServer()){
+			logger.info(model.getMsgServer());
+		}
+	}
 
 	
 }
