@@ -13,11 +13,11 @@ public class Kamisado_Server_Controller{
 		model.newestMsgP1.addListener( (o, oldValue, newValue) -> processMsgP1(newValue));
 		model.newestMsgP2.addListener( (o, oldValue, newValue) -> processMsgP2(newValue));
 		model.connectClients();
-		model.send("This is Player1", true);
-		model.send("This is Player2", false);
+		//model.send("This is Player1", true);
+		//model.send("This is Player2", false);
 
 		
-		//model.initGame();
+		model.initGame();
 		//init the game and afterwards only react
 		
 	}

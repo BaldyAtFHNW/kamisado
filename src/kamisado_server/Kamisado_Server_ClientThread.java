@@ -40,5 +40,4 @@ public class Kamisado_Server_ClientThread implements Runnable{
 			e.printStackTrace();
 		}
 	}
-	
 }

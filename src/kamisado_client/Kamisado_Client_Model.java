@@ -4,8 +4,10 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Logger;
-
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 public class Kamisado_Client_Model {
 	final private String ipAddress = "127.0.0.1";
@@ -14,6 +16,8 @@ public class Kamisado_Client_Model {
 	private Socket serverSocket;
 	
 	protected SimpleStringProperty newestMsg = new SimpleStringProperty();
+	
+	public boolean black;
 	
 	public void connectServer(){
 		try{
@@ -38,5 +42,48 @@ public class Kamisado_Client_Model {
 			e.printStackTrace();
 		}
 	}
+	
+	public JSONObject parseJSON(String msg){
+		JSONParser parser = new JSONParser();
+		JSONObject json = new JSONObject();
+		
+		try {
+			Object obj = parser.parse(msg);
+			json = (JSONObject) obj;
+		} catch (Exception e) {
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+		return json;
+	}
+	
+//	public void processMsg(String msg) {
+//		String type = new String();
+//		JSONParser parser = new JSONParser();
+//		
+//		try {
+//			Object obj = parser.parse(msg);
+//			JSONObject json = (JSONObject) obj;
+//			type = (String) json.get("type");
+//			logger.info("Type: " + type);
+//			
+//			switch (type) {
+//		        case "init":			processInit(json);
+//		        	break;
+//		        case "requestMove":		processRequestMove(json);
+//		        	break;
+//		        case "end":				processEnd(json);
+//	        		break;
+//		        case "reset":			processReset(json);
+//		        	break;
+//		        default: 				logger.warning("Invalid Type");
+//			}
+//			
+//		} catch (Exception e) {
+//			logger.warning(e.toString());
+//			e.printStackTrace();
+//		}
+//	}
+	
 
 }
