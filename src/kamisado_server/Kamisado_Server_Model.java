@@ -1,10 +1,15 @@
 package kamisado_server;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+
+import org.json.simple.JSONObject;
+
+import javafx.beans.property.SimpleStringProperty;
 
 public class Kamisado_Server_Model{
 	Logger logger = Logger.getLogger("");
@@ -16,8 +21,8 @@ public class Kamisado_Server_Model{
 	private Socket socketPlayer1;
 	private Socket socketPlayer2;	
 	
-	private ArrayList<String> msgsPlayer1 = new ArrayList<String>();
-	private ArrayList<String> msgsPlayer2 = new ArrayList<String>();
+	protected SimpleStringProperty newestMsgP1 = new SimpleStringProperty();
+	protected SimpleStringProperty newestMsgP2 = new SimpleStringProperty();
 	
 	public Kamisado_Server_Model(){
 		//empty constructor can be deleted if not needed in the end
@@ -47,90 +52,40 @@ public class Kamisado_Server_Model{
 	
 	}
 	
-	public void newMsgPlayer1(String msg){
-		this.msgsPlayer1.add(msg);
-	}
-	
-	public void newMsgPlayer2(String msg){
-		this.msgsPlayer2.add(msg);
-	}
-	
-	public String getMsgPlayer1(){
-		if (msgsPlayer1.size() == 0){
-			return null;
-		}else{
-			String msg = msgsPlayer1.get(0);
-			msgsPlayer1.remove(0);
-			return msg;
-		}
-	}
-	
-	public String getMsgPlayer2(){
-		if (msgsPlayer2.size() == 0){
-			return null;
-		}else{
-			String msg = msgsPlayer2.get(0);
-			msgsPlayer2.remove(0);
-			return msg;
-		}
-	}
-	
-	public boolean msgPendingPlayer1(){
-		if (msgsPlayer1.size() == 0){
-			return false;
-		}else{
-			return true;
-		}
-	}
-	
-	public boolean msgPendingPlayer2(){
-		if (msgsPlayer2.size() == 0){
-			return false;
-		}else{
-			return true;
-		}
-	}
-	
-	public void sendToPl1(String msg){
-		logger.info("Sending to p1");
-		OutputStreamWriter out;
-		try{
-			out = new OutputStreamWriter(this.socketPlayer1.getOutputStream());
-			out.write(msg + "\n");
-			out.flush();
-		}catch(Exception e){
-			
-		}
-	}
-	
-	public void sendToPl2(String msg){
-		logger.info("Sending to p2");
-		OutputStreamWriter out;
-		try{
-			out = new OutputStreamWriter(this.socketPlayer2.getOutputStream());
-			out.write(msg + "\n");
-			out.flush();
-		}catch(Exception e){
-			
-		}
+	public void initGame(){
+		this.initGameBoard();
+		this.initTowers();
+		
+		JSONObject initP1 = new JSONObject();
+		initP1.put("type", "init");
+		initP1.put("black", true);
+		initP1.put("start", true);
+		
+		JSONObject initP2 = new JSONObject();
+		initP2.put("type", "init");
+		initP2.put("black", false);
+		initP2.put("start", false);
+		
+		this.send(initP1.toString(), true);
+		this.send(initP2.toString(), false);		
 	}
 
-	/*public void send(String msg, int player){
-		try{
-			if(player == 1){
-				logger.info("Sending to p1");
-				this.outpStrPl1.write(msg + "\n");
-				this.outpStrPl1.flush();
-			}else if(player == 2){
-				logger.info("Sending to p2");
-				this.outpStrPl2.write(msg + "\n");
-				this.outpStrPl2.flush();
+	public void send(String msg, boolean player1){
+		OutputStreamWriter out;
+		try {
+			if(player1){
+				out = new OutputStreamWriter(this.socketPlayer1.getOutputStream());
+			}else{
+				out = new OutputStreamWriter(this.socketPlayer2.getOutputStream());
 			}
-		}catch(Exception e){
-			logger.warning(e.toString());
+			out.write(msg + "\n");
+			out.flush();
+		} catch (Exception e) {
+			logger.info(e.toString());
 			e.printStackTrace();
+
 		}
-	}*/
+	}
 	
 	public void initTowers(){
 		
@@ -234,6 +189,4 @@ public class Kamisado_Server_Model{
 		this.gameboard[7][7] = FieldColor.BROWN;
 	}
 
-
-	
 }
