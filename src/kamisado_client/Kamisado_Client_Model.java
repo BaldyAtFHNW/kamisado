@@ -4,6 +4,10 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 import javafx.beans.property.SimpleStringProperty;
 
@@ -14,6 +18,8 @@ public class Kamisado_Client_Model {
 	private Socket serverSocket;
 	
 	protected SimpleStringProperty newestMsg = new SimpleStringProperty();
+
+	public boolean black;
 	
 	public void connectServer(){
 		try{
@@ -38,5 +44,18 @@ public class Kamisado_Client_Model {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public JSONObject parseJSON(String msg){
+		JSONParser parser = new JSONParser();
+		JSONObject json = new JSONObject();
+		
+		try {
+			Object obj = parser.parse(msg);
+			json = (JSONObject) obj;
+		} catch (Exception e) {
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+		return json;
+	}
 }

@@ -27,7 +27,6 @@ public class Kamisado_Client_ServerThread implements Runnable{
 				msg = in.readLine();
 				logger.info("Received: " + msg);
 				model.newestMsg.set(msg);
-				//model.newMsg(msg);
 			}
 		}catch(Exception e){
 			logger.warning(e.toString());

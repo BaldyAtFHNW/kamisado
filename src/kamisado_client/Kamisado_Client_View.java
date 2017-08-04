@@ -1,12 +1,14 @@
 package kamisado_client;
 
 import javafx.scene.Scene;
+import java.util.logging.Logger;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class Kamisado_Client_View {
+	private Logger logger = Logger.getLogger("");
 	private Stage stage;
 	private Kamisado_Client_Model model;
 	protected Button btnClick;
@@ -36,6 +38,15 @@ public class Kamisado_Client_View {
 		stage.setScene(scene);
 		stage.setTitle(" K A M I S A D O ");
 		
+	}
+	
+	public void firstMove(){
+		//implement the first move here
+		if(model.black) {
+			logger.info("First Move Here! I am the Black player");
+		}else {
+			logger.info("First Move Here! I am the White player");
+		}
 	}
 	
 	public void start(){
