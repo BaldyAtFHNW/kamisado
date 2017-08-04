@@ -5,12 +5,15 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import javafx.beans.property.SimpleStringProperty;
+
 public class Kamisado_Client_Model {
 	final private String ipAddress = "127.0.0.1";
 	final private int port = 50000;
 	private Logger logger = Logger.getLogger("");
 	private Socket serverSocket;
-	private ArrayList<String> msgsServer = new ArrayList<String>();	
+	
+	protected SimpleStringProperty newestMsg = new SimpleStringProperty();
 	
 	public void connectServer(){
 		try{
@@ -34,21 +37,6 @@ public class Kamisado_Client_Model {
 			logger.warning(e.toString());
 			e.printStackTrace();
 		}
-	}
-	
-	public void newMsg(String msg) {
-		this.msgsServer.add(msg);
-		logger.info("Added a new Msg to Array: " + msg);
-	}
-	
-	public String getNewMsg(){
-		String msg = this.msgsServer.get(0);
-		this.msgsServer.remove(0);
-		return msg;
-	}
-	
-	public boolean newMsgPending(){
-		return (msgsServer.size() == 0 ? false : true);		
 	}
 
 }
