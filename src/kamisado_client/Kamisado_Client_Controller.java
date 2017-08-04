@@ -3,7 +3,9 @@ package kamisado_client;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.logging.Logger;
-
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import javafx.application.Platform;
 
 public class Kamisado_Client_Controller {
@@ -16,8 +18,9 @@ public class Kamisado_Client_Controller {
 		this.model = model;
 		this.view = view;
 		
+		model.newestMsg.addListener( (o, oldValue, newValue) -> processMsg(newValue));
 		model.connectServer();
-		model.send("Haaaai");		
+		model.send("Haaaai");
     
 		// Example how to register for View events
 		view.btnClick.setOnAction((event) -> {
@@ -28,17 +31,34 @@ public class Kamisado_Client_Controller {
 			view.stop();
 			Platform.exit();
 		});
-	
-		while(running) {
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				logger.info(e.toString());
-				e.printStackTrace();
-			}
-			if(model.newMsgPending()) {
-				logger.info("Message processed: " + model.getNewMsg());
-			}
-		}
 	}
+	
+	private void processMsg(String msg) {
+		logger.info(msg);
+//		String msg = model.getNewMsg();
+//		String type = new String();
+//		JSONParser parser = new JSONParser();
+//		
+//		try {
+//			Object obj = parser.parse(msg);
+//			JSONObject json = (JSONObject) obj;
+//			type = (String) json.get("type");
+//			logger.info("Type: " + type);
+//		} catch (Exception e) {
+//			logger.warning(e.toString());
+//			e.printStackTrace();
+//		}
+		
+//		switch (type) {
+//	        case "init":	logger.info("React to init");
+//	        	break;
+//	        case "move":	logger.info("React to move");//react to move
+//	        	break;
+//	        case "reset":	logger.info("React to reset");
+//	        	break;
+//	        default: logger.warning("Invalid Type");
+//		}
+		
+	}
+	
 }
