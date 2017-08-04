@@ -18,15 +18,7 @@ public class Kamisado_Client_Controller {
 		
 		model.connectServer();
 		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
-		model.send("Haaaai");
+
 		logger.info(model.getSocketStatus());
 
 		
