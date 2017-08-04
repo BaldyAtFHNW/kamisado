@@ -10,10 +10,7 @@ public class Kamisado_Client_Model {
 	final private int port = 50000;
 	private Logger logger = Logger.getLogger("");
 	private Socket serverSocket;
-	public String message;
-	
-	private ArrayList<String> msgsServer = new ArrayList<String>();
-	
+	private ArrayList<String> msgsServer = new ArrayList<String>();	
 	
 	public void connectServer(){
 		try{
@@ -24,9 +21,9 @@ public class Kamisado_Client_Model {
 		}
 		
 		Kamisado_Client_ServerThread server = new Kamisado_Client_ServerThread(Kamisado_Client_Model.this, serverSocket);
-		new Thread(server).start();
+		new Thread(server).start();		
 	}
-	
+
 	public void send(String msg){
 		OutputStreamWriter out;
 		try{
@@ -51,13 +48,7 @@ public class Kamisado_Client_Model {
 	}
 	
 	public boolean newMsgPending(){
-		return (msgsServer.size() == 0 ? false : true);
-//		if(this.msgsServer.size()==0){
-//			return false;
-//		}else {
-//			return true;
-//		}
-		
+		return (msgsServer.size() == 0 ? false : true);		
 	}
 
 }

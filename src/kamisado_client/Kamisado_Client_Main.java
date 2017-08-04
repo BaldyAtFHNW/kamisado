@@ -1,7 +1,5 @@
 package kamisado_client;
 
-import java.util.Iterator;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 

@@ -6,7 +6,7 @@ import org.json.simple.JSONObject;
 
 public class JSONDummie {
 	
-	/*
+	/* 
 	Hey Liz
 	This is the DummieClass I told you about
 	Put an observer on the variable obj just below and simulate a server response 

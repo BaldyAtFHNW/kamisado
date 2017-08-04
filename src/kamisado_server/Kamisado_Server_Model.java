@@ -10,13 +10,12 @@ import java.util.logging.Logger;
 public class Kamisado_Server_Model{
 	Logger logger = Logger.getLogger("");
 	
-	final int boardSize = 7;
-	FieldColor[][] gameboard = new FieldColor[boardSize][boardSize];
-	TowerColor[][] towerPositions = new TowerColor[boardSize][boardSize];
+	final int boardSize = 8;
+	FieldColor[][] gameboard;
+	TowerColor[][] towerPositions;;
 	
 	private Socket socketPlayer1;
-	private Socket socketPlayer2;
-	
+	private Socket socketPlayer2;	
 	
 	private ArrayList<String> msgsPlayer1 = new ArrayList<String>();
 	private ArrayList<String> msgsPlayer2 = new ArrayList<String>();
@@ -29,10 +28,11 @@ public class Kamisado_Server_Model{
 
 		try{
 			ServerSocket listener = new ServerSocket(50000, 10, null);
+			
 			this.socketPlayer1 = listener.accept();
 			logger.info("Player1 connected");
 			Kamisado_Server_ClientThread clientPlayer1 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer1, true);
-			new Thread(clientPlayer1).start();
+			new Thread(clientPlayer1).start();			
 			
 			this.socketPlayer2 = listener.accept();
 			logger.info("Player2 connected");
@@ -48,11 +48,11 @@ public class Kamisado_Server_Model{
 	
 	}
 	
-	public void newMessagePlayer1(String msg){
+	public void newMsgPlayer1(String msg){
 		this.msgsPlayer1.add(msg);
 	}
 	
-	public void newMessagePlayer2(String msg){
+	public void newMsgPlayer2(String msg){
 		this.msgsPlayer2.add(msg);
 	}
 	
@@ -105,10 +105,14 @@ public class Kamisado_Server_Model{
 		} catch (Exception e) {
 			logger.info(e.toString());
 			e.printStackTrace();
+
 		}
 	}
 	
 	public void initTowers(){
+		
+		this.towerPositions = new TowerColor[boardSize][boardSize];
+		
 		//white player tower positions
 		this.towerPositions[0][0] = TowerColor.WBROWN;
 		this.towerPositions[1][0] = TowerColor.WGREEN;
@@ -131,6 +135,9 @@ public class Kamisado_Server_Model{
 	}
 	
 	public void initGameBoard(){
+		
+		this.gameboard = new FieldColor[boardSize][boardSize];
+		
 		this.gameboard[0][0] = FieldColor.BROWN;
 		this.gameboard[1][0] = FieldColor.GREEN;
 		this.gameboard[2][0] = FieldColor.RED;

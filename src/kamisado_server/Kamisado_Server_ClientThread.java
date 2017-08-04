@@ -30,11 +30,9 @@ public class Kamisado_Server_ClientThread implements Runnable{
 			while(true){
 				msg = in.readLine();
 				if(player1 == true){
-					model.newMessagePlayer1(msg);
-					//model.setMsgPlayer1(msg);
+					model.newMsgPlayer1(msg);
 				}else{
-					model.newMessagePlayer2(msg);
-					//model.setMsgPlayer2(msg);
+					model.newMsgPlayer2(msg);
 				}
 			}
 		}catch(Exception e){
