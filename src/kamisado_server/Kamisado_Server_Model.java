@@ -1,15 +1,141 @@
 package kamisado_server;
 
-public class Kamisado_Server_Model {
-	final int boardSize = 7;
-	FieldColor[][] gameboard = new FieldColor[boardSize][boardSize];
-	TowerColor[][] towerPositions = new TowerColor[boardSize][boardSize];
+import java.io.OutputStreamWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.logging.Logger;
+
+public class Kamisado_Server_Model{
+	Logger logger = Logger.getLogger("");
+	
+	final int boardSize = 8;
+	FieldColor[][] gameboard;
+	TowerColor[][] towerPositions;;
+	
+	private Socket socketPlayer1;
+	private Socket socketPlayer2;	
+	
+	private ArrayList<String> msgsPlayer1 = new ArrayList<String>();
+	private ArrayList<String> msgsPlayer2 = new ArrayList<String>();
 	
 	public Kamisado_Server_Model(){
-		
+		//empty constructor can be deleted if not needed in the end
 	}
 	
+	public void connectClients(){
+
+		try{
+			ServerSocket listener = new ServerSocket(50000, 10, null);
+			
+			this.socketPlayer1 = listener.accept();
+			logger.info("Player1 connected");
+			Kamisado_Server_ClientThread clientPlayer1 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer1, true);
+			new Thread(clientPlayer1).start();			
+			
+			this.socketPlayer2 = listener.accept();
+			logger.info("Player2 connected");
+			Kamisado_Server_ClientThread clientPlayer2 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer2, false);
+			new Thread(clientPlayer2).start();
+			
+			listener.close();
+			
+		}catch(Exception e){
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+	
+	}
+	
+	public void newMsgPlayer1(String msg){
+		this.msgsPlayer1.add(msg);
+	}
+	
+	public void newMsgPlayer2(String msg){
+		this.msgsPlayer2.add(msg);
+	}
+	
+	public String getMsgPlayer1(){
+		if (msgsPlayer1.size() == 0){
+			return null;
+		}else{
+			String msg = msgsPlayer1.get(0);
+			msgsPlayer1.remove(0);
+			return msg;
+		}
+	}
+	
+	public String getMsgPlayer2(){
+		if (msgsPlayer2.size() == 0){
+			return null;
+		}else{
+			String msg = msgsPlayer2.get(0);
+			msgsPlayer2.remove(0);
+			return msg;
+		}
+	}
+	
+	public boolean msgPendingPlayer1(){
+		if (msgsPlayer1.size() == 0){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	public boolean msgPendingPlayer2(){
+		if (msgsPlayer2.size() == 0){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	public void sendToPl1(String msg){
+		logger.info("Sending to p1");
+		OutputStreamWriter out;
+		try{
+			out = new OutputStreamWriter(this.socketPlayer1.getOutputStream());
+			out.write(msg + "\n");
+			out.flush();
+		}catch(Exception e){
+			
+		}
+	}
+	
+	public void sendToPl2(String msg){
+		logger.info("Sending to p2");
+		OutputStreamWriter out;
+		try{
+			out = new OutputStreamWriter(this.socketPlayer2.getOutputStream());
+			out.write(msg + "\n");
+			out.flush();
+		}catch(Exception e){
+			
+		}
+	}
+
+	/*public void send(String msg, int player){
+		try{
+			if(player == 1){
+				logger.info("Sending to p1");
+				this.outpStrPl1.write(msg + "\n");
+				this.outpStrPl1.flush();
+			}else if(player == 2){
+				logger.info("Sending to p2");
+				this.outpStrPl2.write(msg + "\n");
+				this.outpStrPl2.flush();
+			}
+		}catch(Exception e){
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+	}*/
+	
 	public void initTowers(){
+		
+		this.towerPositions = new TowerColor[boardSize][boardSize];
+		
 		//white player tower positions
 		this.towerPositions[0][0] = TowerColor.WBROWN;
 		this.towerPositions[1][0] = TowerColor.WGREEN;
@@ -32,6 +158,9 @@ public class Kamisado_Server_Model {
 	}
 	
 	public void initGameBoard(){
+		
+		this.gameboard = new FieldColor[boardSize][boardSize];
+		
 		this.gameboard[0][0] = FieldColor.BROWN;
 		this.gameboard[1][0] = FieldColor.GREEN;
 		this.gameboard[2][0] = FieldColor.RED;
@@ -104,5 +233,7 @@ public class Kamisado_Server_Model {
 		this.gameboard[6][7] = FieldColor.GREEN;
 		this.gameboard[7][7] = FieldColor.BROWN;
 	}
+
+
 	
 }
