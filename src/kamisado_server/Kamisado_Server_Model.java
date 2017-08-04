@@ -1,5 +1,6 @@
 package kamisado_server;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -90,47 +91,23 @@ public class Kamisado_Server_Model{
 			return true;
 		}
 	}
-	
-	public void sendToPl1(String msg){
-		logger.info("Sending to p1");
-		OutputStreamWriter out;
-		try{
-			out = new OutputStreamWriter(this.socketPlayer1.getOutputStream());
-			out.write(msg + "\n");
-			out.flush();
-		}catch(Exception e){
-			
-		}
-	}
-	
-	public void sendToPl2(String msg){
-		logger.info("Sending to p2");
-		OutputStreamWriter out;
-		try{
-			out = new OutputStreamWriter(this.socketPlayer2.getOutputStream());
-			out.write(msg + "\n");
-			out.flush();
-		}catch(Exception e){
-			
-		}
-	}
 
-	/*public void send(String msg, int player){
-		try{
-			if(player == 1){
-				logger.info("Sending to p1");
-				this.outpStrPl1.write(msg + "\n");
-				this.outpStrPl1.flush();
-			}else if(player == 2){
-				logger.info("Sending to p2");
-				this.outpStrPl2.write(msg + "\n");
-				this.outpStrPl2.flush();
+	public void send(String msg, boolean player1){
+		OutputStreamWriter out;
+		try {
+			if(player1){
+				out = new OutputStreamWriter(this.socketPlayer1.getOutputStream());
+			}else{
+				out = new OutputStreamWriter(this.socketPlayer2.getOutputStream());
 			}
-		}catch(Exception e){
-			logger.warning(e.toString());
+			out.write(msg + "\n");
+			out.flush();
+		} catch (Exception e) {
+			logger.info(e.toString());
 			e.printStackTrace();
+
 		}
-	}*/
+	}
 	
 	public void initTowers(){
 		

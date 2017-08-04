@@ -4,43 +4,38 @@ import java.util.logging.Logger;
 
 public class Kamisado_Server_Controller{
 	private Logger logger = Logger.getLogger("");
-	private Kamisado_Server_Model model;
+	Kamisado_Server_Model model;
+	private boolean running = true;
 	
 	public Kamisado_Server_Controller(Kamisado_Server_Model model){
 		this.model = model;
 		
 		
 		model.connectClients();
-		model.initGameBoard();
-		model.initTowers();
-
-		
-		/*model.sendToPl1("To Player 1");
-		model.sendToPl2("To Player 2");
-		
-		model.sendToPl1("To Player 1, again");
-		model.sendToPl2("To Player 2, again");*/
+		model.send("Hi, Player1", true);
+		model.send("Hi, Player2", false);
 		
 		//init the game and afterwards only react
 
-		while(true){
+		while(running){
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				logger.info(e.toString());
+				e.printStackTrace();
+			}
 			if(model.msgPendingPlayer1()){
-				processMessage(model.getMsgPlayer1(), 1);
+				processMessage(model.getMsgPlayer1(), true);
 			}else if(model.msgPendingPlayer2()){
-				processMessage(model.getMsgPlayer2(), 2);
+				processMessage(model.getMsgPlayer2(), false);
 			}
 		}
 		
 	}
 	
 	
-	private void processMessage(String msg, int i){
-		logger.info("Player" + i + ": " + msg);
+	private void processMessage(String msg, boolean player1){		
+		logger.info(player1 ? "Player1: " + msg : "Player2: " + msg);
 	}
-
-	
-	
-	
-	
 	
 }

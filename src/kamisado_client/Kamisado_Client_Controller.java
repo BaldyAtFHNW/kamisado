@@ -8,20 +8,17 @@ import javafx.application.Platform;
 
 public class Kamisado_Client_Controller {
 	private Logger logger = Logger.getLogger("");
-	private Kamisado_Client_Model model;
-	private Kamisado_Client_View view;
-	
+	final private Kamisado_Client_Model model;
+	final private Kamisado_Client_View view;
+	private boolean running = true;	
 	
 	protected Kamisado_Client_Controller(Kamisado_Client_Model model, Kamisado_Client_View view){
 		this.model = model;
 		this.view = view;
 		
 		model.connectServer();
-		model.send("Haaaai");
-
-		logger.info(model.getSocketStatus());
-
-		
+		model.send("Haaaai");		
+    
 		// Example how to register for View events
 		view.btnClick.setOnAction((event) -> {
 			//Do Stuff
@@ -31,19 +28,17 @@ public class Kamisado_Client_Controller {
 			view.stop();
 			Platform.exit();
 		});
-		
-		while(true){
-			processServerMessage();
-		}
-		
-	}
 	
-
-	private void processServerMessage(){
-		if(model.msgPendingServer()){
-			logger.info(model.getMsgServer());
+		while(running) {
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				logger.info(e.toString());
+				e.printStackTrace();
+			}
+			if(model.newMsgPending()) {
+				logger.info("Message processed: " + model.getNewMsg());
+			}
 		}
 	}
-
-	
 }
