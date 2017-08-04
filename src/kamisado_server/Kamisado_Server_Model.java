@@ -1,5 +1,7 @@
 package kamisado_server;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -18,11 +20,6 @@ public class Kamisado_Server_Model{
 	
 	private ArrayList<String> msgsPlayer1 = new ArrayList<String>();
 	private ArrayList<String> msgsPlayer2 = new ArrayList<String>();
-	
-	/*private String msgPlayer1 = "";
-	//private SimpleStringProperty msgPlayer1;
-	private String msgPlayer2 = "";
-	//private SimpleStringProperty msgPlayer2;*/
 	
 	public Kamisado_Server_Model(){
 		//empty constructor can be deleted if not needed in the end
@@ -96,10 +93,18 @@ public class Kamisado_Server_Model{
 	}
 
 	public void send(String msg, boolean player1){
-		if(player1){
-			//send msg to player 1
-		}else{
-			//send msg to player 2
+		OutputStreamWriter out;
+		try {
+			if(player1){
+				out = new OutputStreamWriter(this.socketPlayer1.getOutputStream());
+			}else{
+				out = new OutputStreamWriter(this.socketPlayer2.getOutputStream());
+			}
+			out.write(msg + "\n");
+			out.flush();
+		} catch (Exception e) {
+			logger.info(e.toString());
+			e.printStackTrace();
 		}
 	}
 	
