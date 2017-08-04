@@ -9,6 +9,8 @@ import org.json.simple.parser.JSONParser;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+import javafx.beans.property.SimpleStringProperty;
+
 public class Kamisado_Client_Model {
 	final private String ipAddress = "127.0.0.1";
 	final private int port = 50000;
@@ -16,7 +18,7 @@ public class Kamisado_Client_Model {
 	private Socket serverSocket;
 	
 	protected SimpleStringProperty newestMsg = new SimpleStringProperty();
-	
+
 	public boolean black;
 	
 	public void connectServer(){
@@ -56,34 +58,4 @@ public class Kamisado_Client_Model {
 		}
 		return json;
 	}
-	
-//	public void processMsg(String msg) {
-//		String type = new String();
-//		JSONParser parser = new JSONParser();
-//		
-//		try {
-//			Object obj = parser.parse(msg);
-//			JSONObject json = (JSONObject) obj;
-//			type = (String) json.get("type");
-//			logger.info("Type: " + type);
-//			
-//			switch (type) {
-//		        case "init":			processInit(json);
-//		        	break;
-//		        case "requestMove":		processRequestMove(json);
-//		        	break;
-//		        case "end":				processEnd(json);
-//	        		break;
-//		        case "reset":			processReset(json);
-//		        	break;
-//		        default: 				logger.warning("Invalid Type");
-//			}
-//			
-//		} catch (Exception e) {
-//			logger.warning(e.toString());
-//			e.printStackTrace();
-//		}
-//	}
-	
-
 }

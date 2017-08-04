@@ -1,8 +1,10 @@
 package kamisado_client;
 
+import javafx.scene.Scene;
 import java.util.logging.Logger;
-
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class Kamisado_Client_View {
@@ -18,6 +20,23 @@ public class Kamisado_Client_View {
 		//View Stuff goes here
 		btnClick = new Button(); //Only an example for showing in the controller how to register for events
 		
+		BorderPane root = new BorderPane();
+		Label one = new Label (" one ");
+		Label two = new Label (" two ");
+		Label three = new Label (" three ");
+		Label four = new Label (" four ");
+		Label five = new Label (" five ");
+		root.setTop(one);
+		root.setBottom(two);
+		root.setLeft(three);
+		root.setRight(four);
+		root.setCenter(five);
+		
+		Scene scene = new Scene(root);
+		scene.getStylesheets().add(
+                getClass().getResource("layouts.css").toExternalForm());
+		stage.setScene(scene);
+		stage.setTitle(" K A M I S A D O ");
 		
 	}
 	

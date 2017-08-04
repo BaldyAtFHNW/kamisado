@@ -26,8 +26,7 @@ public class Kamisado_Client_Controller {
 		view.getStage().setOnCloseRequest((event)->{
 			view.stop();
 			Platform.exit();
-		});
-		
+		});		
 		
 		model.newestMsg.addListener( (o, oldValue, newValue) -> processMsg(newValue));
 		model.connectServer();
@@ -69,7 +68,5 @@ public class Kamisado_Client_Controller {
 	
 	private void processReset(JSONObject json){
 		
-	}
-
-	
+	}	
 }
