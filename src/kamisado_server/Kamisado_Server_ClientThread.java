@@ -10,13 +10,13 @@ public class Kamisado_Server_ClientThread implements Runnable{
 	private Logger logger = Logger.getLogger("");
 	Kamisado_Server_Model model;
 	Socket clientSocket;
-	boolean player1 = false;
+	boolean black = false;
 	BufferedReader in;
 
-	public Kamisado_Server_ClientThread(Kamisado_Server_Model model, Socket socket, boolean player1){
+	public Kamisado_Server_ClientThread(Kamisado_Server_Model model, Socket socket, boolean black){
 		this.model = model;
 		this.clientSocket = socket;
-		this.player1 = player1;
+		this.black = black;
 	}
 	
 	
@@ -29,10 +29,10 @@ public class Kamisado_Server_ClientThread implements Runnable{
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			while(true){
 				msg = in.readLine();
-				if(player1 == true){
-					model.newestMsgP1.set(msg);
+				if(black == true){
+					model.newestMsgPlBlack.set(msg);
 				}else{
-					model.newestMsgP2.set(msg);
+					model.newestMsgPlWhite.set(msg);
 				}
 			}
 		}catch(Exception e){
