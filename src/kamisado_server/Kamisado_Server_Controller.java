@@ -4,24 +4,29 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 public class Kamisado_Server_Controller{
 	private Logger logger = Logger.getLogger("");
-	Kamisado_Server_Model model;
+	private Kamisado_Server_Model model;
+	private Kamisado_Server_View view;
 	
-	public Kamisado_Server_Controller(Kamisado_Server_Model model){
+	public Kamisado_Server_Controller(Kamisado_Server_Model model, Kamisado_Server_View view){
 		this.model = model;
+		this.view = view;
 		
-		testOnlyWithServer();
+		//testOnlyWithServer();
 		
 		model.newestMsgPlBlack.addListener( (o, oldValue, newValue) -> processMsg(newValue, 'B'));
 		model.newestMsgPlWhite.addListener( (o, oldValue, newValue) -> processMsg(newValue, 'W'));
-		model.connectClients();
-		
-		model.initGame();
-		//init the game and afterwards only react
+		model.newMsgGui.addListener( (o, oldValue, newValue) -> view.info.appendText(newValue + "\n"));
+		view.startSrv.setOnAction((event)->{
+			model.connectClients();
+			model.initGame();
+		});
+		view.endSrv.setOnAction((event)->{
+			view.stop();
+		});
+	
 	}
 	
 	private void processMsg(String msg, char plColor) {
@@ -31,12 +36,13 @@ public class Kamisado_Server_Controller{
 		switch (type) {
 	        case "move":			processMove(json, plColor);
 	        	break;
-	        case "end":				processEnd(json, plColor);// for surrender
+	        case "end":				processEnd(json, plColor);// surrendering
         	break;
 	        default: 				logger.warning("Invalid Type");
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void processMove(JSONObject json, char plColor){
 		String movedTwrStr = (String) json.get("towerColor");
 		TowerColor movedTwr = TowerColor.valueOf(movedTwrStr);
@@ -65,22 +71,40 @@ public class Kamisado_Server_Controller{
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	private void processEnd(JSONObject json, char surrenderer) {
+		JSONObject json_winner = new JSONObject();
+		json_winner.put("type", "end");
+		json_winner.put("won", true);
+		json_winner.put("reason", "surrender");
+		
+		JSONObject json_loser = new JSONObject();
+		json_loser.put("type", "end");
+		json_loser.put("won", false);
+		json_loser.put("reason", "surrender");
+		
+		char winnerCol = (surrenderer == 'W') ? 'B' : 'W';
+		model.send(json_winner.toString(), winnerCol);
+		model.send(json_loser.toString(), surrenderer);
+	}
+	
+	@SuppressWarnings("unchecked")
 	private void plrWon(char winnerCol) {
 		JSONObject json_winner = new JSONObject();
 		json_winner.put("type", "end");
 		json_winner.put("won", true);
 		json_winner.put("reason", "win");
 		
-		JSONObject json_looser = new JSONObject();
-		json_looser.put("type", "end");
-		json_looser.put("won", false);
-		json_looser.put("reason", "lost");
+		JSONObject json_loser = new JSONObject();
+		json_loser.put("type", "end");
+		json_loser.put("won", false);
+		json_loser.put("reason", "lost");
 		
 		char looserCol = (winnerCol == 'W') ? 'B' : 'W';
 		model.send(json_winner.toString(), winnerCol);
-		model.send(json_looser.toString(), looserCol);
+		model.send(json_loser.toString(), looserCol);
 	}
-	
+
 	private void testOnlyWithServer() {
 		model.initTowers();
 		model.initGameBoard();		
@@ -131,6 +155,7 @@ public class Kamisado_Server_Controller{
 			
 			movingTower = nextTower;			
 		}
+		scanner.close();
 		System.exit(0);
 	}
 	

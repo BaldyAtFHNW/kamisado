@@ -1,10 +1,8 @@
 package kamisado_server;
 
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.json.simple.JSONArray;
@@ -20,32 +18,32 @@ public class Kamisado_Server_Model{
 	private FieldColor[][] gameboard;
 	private TowerColor[][] towerPositions;;
 	
-	private Socket socketPlayerBlack;
-	private Socket socketPlayerWhite;	
+	private Socket socketPlB;
+	private Socket socketPlW;	
 	
 	protected SimpleStringProperty newestMsgPlBlack = new SimpleStringProperty();
 	protected SimpleStringProperty newestMsgPlWhite = new SimpleStringProperty();
 	
-	public Kamisado_Server_Model(){
-		//empty constructor can be deleted if not needed in the end
-	}
+	protected SimpleStringProperty newMsgGui = new SimpleStringProperty();
 	
 	public void connectClients(){
-
+		
 		try{
 			ServerSocket listener = new ServerSocket(50000, 10, null);
 			
-			this.socketPlayerBlack = listener.accept();
+			this.socketPlB = listener.accept();
 			logger.info("Player1 (black) connected");
-			Kamisado_Server_ClientThread clientPlayerBlack = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayerBlack, true);
-			new Thread(clientPlayerBlack).start();			
+			Kamisado_Server_ClientThread clientPlayerBlack = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlB, true);
+			new Thread(clientPlayerBlack).start();
 			
-			this.socketPlayerWhite = listener.accept();
+			this.socketPlW = listener.accept();
 			logger.info("Player2 (white) connected");
-			Kamisado_Server_ClientThread clientPlayerWhite = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayerWhite, false);
+			Kamisado_Server_ClientThread clientPlayerWhite = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlW, false);
 			new Thread(clientPlayerWhite).start();
 			
 			listener.close();
+			
+			newMsgGui.set("Black Player: " + socketPlB.toString() + "\nWhite Player: " + socketPlB.toString());
 			
 		}catch(Exception e){
 			logger.warning(e.toString());
@@ -54,6 +52,7 @@ public class Kamisado_Server_Model{
 	
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void initGame(){
 		this.initGameBoard();
 		this.initTowers();
@@ -76,11 +75,11 @@ public class Kamisado_Server_Model{
 		OutputStreamWriter out;
 		try {
 			if(plCol == 'B'){
-				out = new OutputStreamWriter(this.socketPlayerBlack.getOutputStream());
+				out = new OutputStreamWriter(this.socketPlB.getOutputStream());
 				out.write(msg + "\n");
 				out.flush();
 			}else if(plCol == 'W'){
-				out = new OutputStreamWriter(this.socketPlayerWhite.getOutputStream());
+				out = new OutputStreamWriter(this.socketPlW.getOutputStream());
 				out.write(msg + "\n");
 				out.flush();
 			}else {
@@ -130,6 +129,7 @@ public class Kamisado_Server_Model{
 		return this.gameboard[xPos][yPos];
 	}
 	
+	@SuppressWarnings("unchecked")
 	public JSONArray getPossibleMoves(TowerColor towerColor) {
 		Integer[] currentPos = this.getTowerPos(towerColor);
 		char color = towerColor.toString().charAt(0); //Either W or B
