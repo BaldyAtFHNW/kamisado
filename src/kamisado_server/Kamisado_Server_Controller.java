@@ -2,8 +2,10 @@ package kamisado_server;
 
 import java.util.Scanner;
 import java.util.logging.Logger;
-
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Kamisado_Server_Controller{
 	private Logger logger = Logger.getLogger("");
@@ -14,20 +16,69 @@ public class Kamisado_Server_Controller{
 		
 		testOnlyWithServer();
 		
-		model.newestMsgPlBlack.addListener( (o, oldValue, newValue) -> processMsgPlBlack(newValue));
-		model.newestMsgPlWhite.addListener( (o, oldValue, newValue) -> processMsgPlWhite(newValue));
+		model.newestMsgPlBlack.addListener( (o, oldValue, newValue) -> processMsg(newValue, 'B'));
+		model.newestMsgPlWhite.addListener( (o, oldValue, newValue) -> processMsg(newValue, 'W'));
 		model.connectClients();
 		
 		model.initGame();
 		//init the game and afterwards only react
 	}
 	
-	private void processMsgPlBlack(String msg){
-		logger.info(msg);
+	private void processMsg(String msg, char plColor) {
+		JSONObject json = model.parseJSON(msg);
+		String type = (String) json.get("type");
+		
+		switch (type) {
+	        case "move":			processMove(json, plColor);
+	        	break;
+	        case "end":				processEnd(json, plColor);// for surrender
+        	break;
+	        default: 				logger.warning("Invalid Type");
+		}
 	}
 	
-	private void processMsgPlWhite(String msg){
-		logger.info(msg);
+	private void processMove(JSONObject json, char plColor){
+		String movedTwrStr = (String) json.get("towerColor");
+		TowerColor movedTwr = TowerColor.valueOf(movedTwrStr);
+		int newXPos = (int) json.get("xPos");
+		int newYPos = (int) json.get("yPos");
+		
+		model.moveTower(movedTwr, newXPos, newYPos);
+		FieldColor landedFieldCol = model.getFieldColor(newXPos, newYPos);
+		TowerColor nextTwr = TowerColor.valueOf(plColor + landedFieldCol.toString());
+		
+		JSONArray possibleMoves = model.getPossibleMoves(nextTwr);
+		
+		JSONObject newJSON = new JSONObject();
+		newJSON.put("type", "requestMove");
+		newJSON.put("movedTower", movedTwr.toString());
+		newJSON.put("xPos", newXPos);
+		newJSON.put("yPos", newYPos);
+		newJSON.put("nextTower", nextTwr.toString());
+		newJSON.put("possibleMoves", possibleMoves);
+		
+		model.send(newJSON.toString(), plColor);
+		
+		//Check if somebody won
+		if(newYPos == 0 || newYPos == 7) {
+			plrWon(plColor);
+		}
+	}
+	
+	private void plrWon(char winnerCol) {
+		JSONObject json_winner = new JSONObject();
+		json_winner.put("type", "end");
+		json_winner.put("won", true);
+		json_winner.put("reason", "win");
+		
+		JSONObject json_looser = new JSONObject();
+		json_looser.put("type", "end");
+		json_looser.put("won", false);
+		json_looser.put("reason", "lost");
+		
+		char looserCol = (winnerCol == 'W') ? 'B' : 'W';
+		model.send(json_winner.toString(), winnerCol);
+		model.send(json_looser.toString(), looserCol);
 	}
 	
 	private void testOnlyWithServer() {
@@ -56,7 +107,7 @@ public class Kamisado_Server_Controller{
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				logger.warning(e.toString());
 				e.printStackTrace();
 			}
 			

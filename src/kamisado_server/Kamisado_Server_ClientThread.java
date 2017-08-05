@@ -19,7 +19,6 @@ public class Kamisado_Server_ClientThread implements Runnable{
 		this.black = black;
 	}
 	
-	
 	@Override
 	public void run(){
 		BufferedReader in;

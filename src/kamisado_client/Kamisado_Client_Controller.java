@@ -30,7 +30,6 @@ public class Kamisado_Client_Controller {
 		
 		model.newestMsg.addListener( (o, oldValue, newValue) -> processMsg(newValue));
 		model.connectServer();
-		model.send("Haaaai");
 
 	}
 	

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import javafx.beans.property.SimpleStringProperty;
 
@@ -67,20 +68,24 @@ public class Kamisado_Server_Model{
 		initPlayerWhite.put("black", false);
 		initPlayerWhite.put("start", false);
 		
-		this.send(initPlayerBlack.toString(), true);
-		this.send(initPlayerWhite.toString(), false);		
+		this.send(initPlayerBlack.toString(), 'B');
+		this.send(initPlayerWhite.toString(), 'W');		
 	}
 
-	public void send(String msg, boolean black){
+	public void send(String msg, char plCol){
 		OutputStreamWriter out;
 		try {
-			if(black){
+			if(plCol == 'B'){
 				out = new OutputStreamWriter(this.socketPlayerBlack.getOutputStream());
-			}else{
+				out.write(msg + "\n");
+				out.flush();
+			}else if(plCol == 'W'){
 				out = new OutputStreamWriter(this.socketPlayerWhite.getOutputStream());
+				out.write(msg + "\n");
+				out.flush();
+			}else {
+				logger.warning("Receiver does not exist!");
 			}
-			out.write(msg + "\n");
-			out.flush();
 		} catch (Exception e) {
 			logger.info(e.toString());
 			e.printStackTrace();
@@ -172,6 +177,20 @@ public class Kamisado_Server_Model{
 		}while(this.towerPositions[x][y] == null);
 		
 		return possibleMoves;
+	}
+	
+	public JSONObject parseJSON(String msg){
+		JSONParser parser = new JSONParser();
+		JSONObject json = new JSONObject();
+		
+		try {
+			Object obj = parser.parse(msg);
+			json = (JSONObject) obj;
+		} catch (Exception e) {
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+		return json;
 	}
 	
 	public void initTowers(){
