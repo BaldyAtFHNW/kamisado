@@ -61,6 +61,30 @@ public class KamisadoClientModel {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void sendMove(String towerColor, int xPos, int yPos) {
+		if(this.black) { //this is the black client
+			xPos = turnUpsideDown(xPos);
+		}else {
+			yPos = turnUpsideDown(yPos);
+		}
+		
+		JSONObject json = new JSONObject();
+		json.put("type", "move");
+		json.put("towerColor", towerColor);
+		json.put("xPos", xPos);
+		json.put("yPos", yPos);
+		
+		this.send(json.toString());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void surrender() {		
+		JSONObject json = new JSONObject();
+		json.put("type", "end");
+		this.send(json.toString());
+	}
+	
 	public JSONObject parseJSON(String msg){
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();

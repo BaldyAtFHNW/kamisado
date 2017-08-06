@@ -57,8 +57,8 @@ public class KamisadoClientController {
 	        	break;
 	        case "end":				processEnd(json);
 	    		break;
-	        case "reset":			processReset(json);
-	        	break;
+	        //case "reset":			processReset(json);     <------------ not needed anymore
+	        //	break;
 	        default: 				logger.warning("Invalid Type");
 		}
 	}
@@ -86,6 +86,7 @@ public class KamisadoClientController {
 		
 		//Highlight possible moves ----- (Highlight fields and make them clickable)
 		JSONArray jsonArray = (JSONArray) json.get("possibleMoves");
+		@SuppressWarnings("unchecked")
 		Iterator<JSONObject> iterator = jsonArray.iterator();
 		
 		while(iterator.hasNext()) {
@@ -102,10 +103,10 @@ public class KamisadoClientController {
 	}
 	
 	private void processEnd(JSONObject json){
+		boolean won = (boolean) json.get("won");
+		String reason = (String) json.get("reason");
 		
+		view.showEnd(won, reason);
 	}
 	
-	private void processReset(JSONObject json){
-		
-	}	
 }
