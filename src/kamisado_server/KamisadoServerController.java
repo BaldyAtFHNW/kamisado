@@ -106,12 +106,12 @@ public class KamisadoServerController{
 		JSONObject json_winner = new JSONObject();
 		json_winner.put("type", "end");
 		json_winner.put("won", true);
-		json_winner.put("reason", "win");
+		json_winner.put("reason", "ended");
 		
 		JSONObject json_loser = new JSONObject();
 		json_loser.put("type", "end");
 		json_loser.put("won", false);
-		json_loser.put("reason", "lost");
+		json_loser.put("reason", "ended");
 		
 		char looserCol = (winnerCol == 'W') ? 'B' : 'W';
 		model.send(json_winner.toString(), winnerCol);

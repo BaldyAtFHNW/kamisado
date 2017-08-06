@@ -61,6 +61,30 @@ public class KamisadoClientModel {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void sendMove(String towerColor, int xPos, int yPos) {
+		if(this.black) { //this is the black client
+			xPos = turnUpsideDown(xPos);
+		}else {
+			yPos = turnUpsideDown(yPos);
+		}
+		
+		JSONObject json = new JSONObject();
+		json.put("type", "move");
+		json.put("towerColor", towerColor);
+		json.put("xPos", xPos);
+		json.put("yPos", yPos);
+		
+		this.send(json.toString());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void surrender() {		
+		JSONObject json = new JSONObject();
+		json.put("type", "end");
+		this.send(json.toString());
+	}
+	
 	public JSONObject parseJSON(String msg){
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
@@ -77,6 +101,31 @@ public class KamisadoClientModel {
 	
 	public String getPlayerName() {
 		return playerName;
+	}
+	
+	//Changing number values for applying coordinates onto the grid
+	public int turnUpsideDown(int number) {
+		switch (number) {
+		case 0 : number = 7;
+			break;
+		case 1 : number = 6;
+			break;
+		case 2 : number = 5;
+			break;
+		case 3 : number = 4;
+			break;
+		case 4 : number = 3;
+			break;
+		case 5 : number = 2;
+			break;
+		case 6 : number = 1;
+			break;
+		case 7 : number = 0;
+			break;
+		default : number = -1;
+			break;
+		}
+	return number;
 	}
 	
 }
