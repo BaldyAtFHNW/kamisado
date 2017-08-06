@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -598,7 +599,8 @@ public class Kamisado_Client_View {
 		scene.getStylesheets().add(
                 getClass().getResource("layouts.css").toExternalForm());
 		stage.setScene(scene);
-		stage.setTitle(" K A M I S A D O ");
+		stage.setTitle("Kamisado by ShortyNBaldy - Client");
+		stage.getIcons().add(new Image("/shortyNBaldy.png"));
 		
 	}
 

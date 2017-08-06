@@ -14,12 +14,12 @@ import javafx.beans.property.SimpleStringProperty;
 public class Kamisado_Client_Model {
 	final public String ipAddress;
 	final private int port = 50000;
-	final private String playerName;
 	private Logger logger = Logger.getLogger("");
 	private Socket serverSocket;
 	
 	protected SimpleStringProperty newestMsg = new SimpleStringProperty();
 
+	final public String playerName;
 	public boolean black;
 	public String opponent;
 	
@@ -69,4 +69,5 @@ public class Kamisado_Client_Model {
 	public String getPlayerName() {
 		return playerName;
 	}
+	
 }
