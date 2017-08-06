@@ -607,13 +607,11 @@ public class KamisadoClientView {
 		resetGame.setOnAction((event)->{
 		//	if(gameBoard.getID.equals("BBROWN"));
 				
-		while(gameBoard.getId() != null) {
-			
-		}
-			//oldLocationCol = gameBoard.getColumnIndex(wBrown);
-			//oldLocationRow = gameBoard.getRowIndex(wBrown);
-			//gameBoard.setColumnIndex(bOrange, 5);
-			//gameBoard.setRowIndex(bOrange, 2);
+		//while(gameBoard.getId() != null) {}
+			oldLocationCol = gameBoard.getColumnIndex(wBrown);
+			oldLocationRow = gameBoard.getRowIndex(wBrown);
+			gameBoard.setColumnIndex(bOrange, 5);
+			gameBoard.setRowIndex(bOrange, 2);
 			
 					
 			
@@ -626,7 +624,10 @@ public class KamisadoClientView {
 			
 		});
 		
-	
+		giveUp.setOnAction((event)->{
+			model.surrender();
+		
+	});
 		
 		
 		Scene scene = new Scene(root);
@@ -640,8 +641,18 @@ public class KamisadoClientView {
 
 		public void moveTower(String movedTower, int newXPos, int newYPos) {
 			//gameBoard.getId().equalsTo().
-		}
-	
+			//if (gameBoard.getID != null) {
+			String s = movedTower;
+			if (s.equals(gameBoard.getId())){
+				gameBoard.relocate(newXPos, newYPos);
+				
+				//gameBoard.setRowIndex(movedTower, newXPos);
+				//gameBoard.setColumnIndex(movedTower, newYPos);
+			}
+			}
+		
+
+
 	
 	public void firstMove(){
 		//implement the first move here
@@ -684,6 +695,10 @@ public class KamisadoClientView {
 		}
 		alert.showAndWait();
 		this.stop();
+	}
+	
+	public void highlightField(int xPos, int yPos) {
+	
 	}
 
 }
