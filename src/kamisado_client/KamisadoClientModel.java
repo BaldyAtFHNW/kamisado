@@ -79,4 +79,29 @@ public class KamisadoClientModel {
 		return playerName;
 	}
 	
+	//Changing number values for applying coordinates onto the grid
+	public int turnUpsideDown(int number) {
+		switch (number) {
+		case 0 : number = 7;
+			break;
+		case 1 : number = 6;
+			break;
+		case 2 : number = 5;
+			break;
+		case 3 : number = 4;
+			break;
+		case 4 : number = 3;
+			break;
+		case 5 : number = 2;
+			break;
+		case 6 : number = 1;
+			break;
+		case 7 : number = 0;
+			break;
+		default : number = -1;
+			break;
+		}
+	return number;
+	}
+	
 }

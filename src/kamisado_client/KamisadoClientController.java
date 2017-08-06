@@ -2,7 +2,10 @@ package kamisado_client;
 
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.logging.Logger;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -69,7 +72,27 @@ public class KamisadoClientController {
 	}
 	
 	private void processRequestMove(JSONObject json){
+		//Display oppononent's move
+		String movedTower = (String) json.get("movedTower");
+		int newXPos = (int) json.get("xPos");
+		int newYPos = (int) json.get("yPos");
+		//view.moveTower(movedTower, newXPos, newYPos);									<--------- does not exist yet
 		
+		//Highlight possible moves ----- (Highlight fields and make them clickable)
+		JSONArray jsonArray = (JSONArray) json.get("possibleMoves");
+		Iterator<JSONObject> iterator = jsonArray.iterator();
+		
+		while(iterator.hasNext()) {
+			JSONObject possibleMove = iterator.next();
+			int xPos = (int) possibleMove.get("xPos");
+			int yPos = (int) possibleMove.get("yPos");
+			if(model.black) { //this is the black client
+				xPos = model.turnUpsideDown(xPos);
+			}else {
+				yPos = model.turnUpsideDown(yPos);
+			}
+			//view.highlightField(xPos, yPos);											<--------- does not exist yet
+		}
 	}
 	
 	private void processEnd(JSONObject json){
