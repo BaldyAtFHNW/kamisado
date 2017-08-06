@@ -26,6 +26,10 @@ public class KamisadoClientController {
 			//Do Stuff
 		});
 		
+		view.giveUp.setOnAction((event)->{
+			model.surrender();
+		
+	});
 		view.getStage().setOnCloseRequest((event)->{
 			view.stop();
 			Platform.exit();

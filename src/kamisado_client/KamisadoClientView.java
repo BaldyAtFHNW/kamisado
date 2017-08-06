@@ -624,10 +624,7 @@ public class KamisadoClientView {
 			
 		});
 		
-		giveUp.setOnAction((event)->{
-			model.surrender();
 		
-	});
 		
 		
 		Scene scene = new Scene(root);
