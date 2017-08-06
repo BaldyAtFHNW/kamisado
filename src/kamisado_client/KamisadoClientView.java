@@ -477,48 +477,56 @@ public class KamisadoClientView {
 		bOrange.setFill(Color.ORANGE);
 		bOrange.setStroke(Color.BLACK);
 		bOrange.setStrokeWidth(WIDTH);
+		bOrange.setId("BORANGE");
 		gameBoard.add(bOrange, 0, 0);
 		
 		Circle bBlue = new Circle(FIELD_SIZE * SCALEDOWN);
 		bBlue.setFill(Color.BLUE);
 		bBlue.setStroke(Color.BLACK);
 		bBlue.setStrokeWidth(WIDTH);
+		bBlue.setId("BBLUE");
 		gameBoard.add(bBlue, 1, 0);
 		
 		Circle bPurple = new Circle(FIELD_SIZE * SCALEDOWN);
 		bPurple.setFill(Color.PURPLE);
 		bPurple.setStroke(Color.BLACK);
 		bPurple.setStrokeWidth(WIDTH);
+		bPurple.setId("BPURPLE");
 		gameBoard.add(bPurple, 2, 0);
 		
 		Circle bPink = new Circle(FIELD_SIZE * SCALEDOWN);
 		bPink.setFill(Color.PINK);
 		bPink.setStroke(Color.BLACK);
 		bPink.setStrokeWidth(WIDTH);
+		bPink.setId("BPINK");
 		gameBoard.add(bPink, 3, 0);
 		
 		Circle bYellow = new Circle(FIELD_SIZE * SCALEDOWN);
 		bYellow.setFill(Color.GOLD);
 		bYellow.setStroke(Color.BLACK);
 		bYellow.setStrokeWidth(WIDTH);
+		bYellow.setId("BYELLOW");
 		gameBoard.add(bYellow, 4, 0);
 				
 		Circle bRed = new Circle(FIELD_SIZE * SCALEDOWN);
 		bRed.setFill(Color.RED);
 		bRed.setStroke(Color.BLACK);
 		bRed.setStrokeWidth(WIDTH);
+		bRed.setId("BRED");
 		gameBoard.add(bRed,5, 0);
 		
 		Circle bGreen = new Circle(FIELD_SIZE * SCALEDOWN);
 		bGreen.setFill(Color.GREEN);
 		bGreen.setStroke(Color.BLACK);
 		bGreen.setStrokeWidth(WIDTH);
+		bGreen.setId("BGREEN");
 		gameBoard.add(bGreen, 6, 0);
 		
 		Circle bBrown = new Circle(FIELD_SIZE * SCALEDOWN);
 		bBrown.setFill(Color.BROWN);
 		bBrown.setStroke(Color.BLACK);
 		bBrown.setStrokeWidth(WIDTH);
+		bBrown.setId("BBROWN");
 		gameBoard.add(bBrown, 7, 0);
 		
 	//white towers
@@ -526,48 +534,56 @@ public class KamisadoClientView {
 		wOrange.setFill(Color.ORANGE);
 		wOrange.setStroke(Color.WHITE);
 		wOrange.setStrokeWidth(WIDTH);
+		wOrange.setId("WORANGE");
 		gameBoard.add(wOrange, 7, 7);
 		
 		Circle wBlue = new Circle(FIELD_SIZE * SCALEDOWN);
 		wBlue.setFill(Color.BLUE);
 		wBlue.setStroke(Color.WHITE);
 		wBlue.setStrokeWidth(WIDTH);
+		wBlue.setId("WBLUE");
 		gameBoard.add(wBlue, 6, 7);
 		
 		Circle wPurple = new Circle(FIELD_SIZE * SCALEDOWN);
 		wPurple.setFill(Color.PURPLE);
 		wPurple.setStroke(Color.WHITE);
 		wPurple.setStrokeWidth(WIDTH);
+		wPurple.setId("WBLUE");
 		gameBoard.add(wPurple, 5, 7);
 		
 		Circle wPink = new Circle(FIELD_SIZE * SCALEDOWN);
 		wPink.setFill(Color.PINK);
 		wPink.setStroke(Color.WHITE);
 		wPink.setStrokeWidth(WIDTH);
+		wPink.setId("WPINK");
 		gameBoard.add(wPink, 4, 7);
 		
 		Circle wYellow= new Circle(FIELD_SIZE * SCALEDOWN);
 		wYellow.setFill(Color.GOLD);
 		wYellow.setStroke(Color.WHITE);
 		wYellow.setStrokeWidth(WIDTH);
+		wYellow.setId("WYELLOW");
 		gameBoard.add(wYellow, 3, 7);
 				
 		Circle wRed = new Circle(FIELD_SIZE * SCALEDOWN);
 		wRed.setFill(Color.RED);
 		wRed.setStroke(Color.WHITE);
 		wRed.setStrokeWidth(WIDTH);
+		wRed.setId("WRED");
 		gameBoard.add(wRed,  2, 7);
 		
 		Circle wGreen = new Circle(FIELD_SIZE * SCALEDOWN);
 		wGreen.setFill(Color.GREEN);
 		wGreen.setStroke(Color.WHITE);
 		wGreen.setStrokeWidth(WIDTH);
+		wGreen.setId("WGREEN");
 		gameBoard.add(wGreen, 1, 7);
 		
 		Circle wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
 		wBrown.setFill(Color.BROWN);
 		wBrown.setStroke(Color.WHITE);
 		wBrown.setStrokeWidth(WIDTH);
+		wBrown.setId("WBROWN");
 		gameBoard.add(wBrown, 0, 7);
 				
 		root.setCenter(gameBoard);
@@ -586,10 +602,18 @@ public class KamisadoClientView {
 		//add functionality to the reset button
 		
 		resetGame.setOnAction((event)->{
-			oldLocationCol = gameBoard.getColumnIndex(wBrown);
-			oldLocationRow = gameBoard.getRowIndex(wBrown);
-			gameBoard.setColumnIndex(wBrown, 5);
-			gameBoard.setRowIndex(wBrown, 2);
+		//	if(gameBoard.getID.equals("BBROWN"));
+				
+		while(gameBoard.getId() != null) {
+			
+		}
+			//oldLocationCol = gameBoard.getColumnIndex(wBrown);
+			//oldLocationRow = gameBoard.getRowIndex(wBrown);
+			//gameBoard.setColumnIndex(bOrange, 5);
+			//gameBoard.setRowIndex(bOrange, 2);
+			
+					
+			
 			
 		});
 		
@@ -611,6 +635,9 @@ public class KamisadoClientView {
 		
 	}
 
+		public void moveTower(String movedTower, int newXPos, int newYPos) {
+			//gameBoard.getId().equalsTo().
+		}
 	
 	
 	public void firstMove(){
