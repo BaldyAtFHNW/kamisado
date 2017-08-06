@@ -10,6 +10,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -44,6 +45,7 @@ public class Kamisado_Client_View {
 		
 		BorderPane root = new BorderPane();
 		GridPane gameBoard = new GridPane(); // Kamisado game board
+		gameBoard.setGridLinesVisible(true);
 	
 		HBox upperScreen = new HBox(); // upper part of the game screen for buttons
 		root.setTop(upperScreen); 
@@ -73,6 +75,7 @@ public class Kamisado_Client_View {
 		a.setWidth(FIELD_SIZE);
 		a.setHeight(FIELD_SIZE);
 		a.setFill(Color.ORANGE);
+		a.setStroke(Color.BLACK);
 		gameBoard.add(a, 0, 0);
 		
 		Rectangle b = new Rectangle();
@@ -474,6 +477,10 @@ public class Kamisado_Client_View {
 				gameBoard.add(ppp, 0, 4);
 				
 		
+		Circle bOrange = new Circle(FIELD_SIZE * 0.45);
+		bOrange.setFill(Color.ORANGE);
+		bOrange.setStroke(Color.BLACK);
+		gameBoard.add(bOrange, 0, 0);
 		root.setCenter(gameBoard);
 		
 		Label lblBottom = new Label("Bottom");
