@@ -1,8 +1,10 @@
 package kamisado_server;
 
 import java.io.OutputStreamWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.logging.Logger;
 
 import org.json.simple.JSONArray;
@@ -18,6 +20,7 @@ public class Kamisado_Server_Model{
 	private FieldColor[][] gameboard;
 	private TowerColor[][] towerPositions;;
 	
+	ServerSocket listener;
 	private Socket socketPlB;
 	private Socket socketPlW;	
 	
@@ -27,29 +30,39 @@ public class Kamisado_Server_Model{
 	protected SimpleStringProperty newMsgGui = new SimpleStringProperty();
 	
 	public void connectClients(){
-		
+		newMsgGui.set("Server started\nPending for players - Please wait");
 		try{
-			ServerSocket listener = new ServerSocket(50000, 10, null);
-			
-			this.socketPlB = listener.accept();
-			logger.info("Player1 (black) connected");
-			Kamisado_Server_ClientThread clientPlayerBlack = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlB, true);
-			new Thread(clientPlayerBlack).start();
-			
-			this.socketPlW = listener.accept();
-			logger.info("Player2 (white) connected");
-			Kamisado_Server_ClientThread clientPlayerWhite = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlW, false);
-			new Thread(clientPlayerWhite).start();
-			
-			listener.close();
-			
-			newMsgGui.set("Black Player: " + socketPlB.toString() + "\nWhite Player: " + socketPlB.toString());
-			
+			listener = new ServerSocket(50000, 10, null);
+			Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					try {
+						//Connect 1st Player
+						socketPlB = listener.accept();
+						newMsgGui.set("Player1 (black) connected: " + socketPlB.toString());
+						Kamisado_Server_ClientThread clientPlayerBlack = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlB, true);
+						new Thread(clientPlayerBlack).start();
+						
+						//Connect 2nd Player
+						socketPlW = listener.accept();
+						newMsgGui.set("Player2 (white) connected: " + socketPlW.toString());
+						Kamisado_Server_ClientThread clientPlayerWhite = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlW, false);
+						new Thread(clientPlayerWhite).start();
+						
+						listener.close();
+					}catch(Exception e){
+						logger.warning(e.toString());
+						e.printStackTrace();
+					}
+					initGame(); //Start game by sending initialization messages to both clients
+				}
+			};
+			Thread t = new Thread(r, "ServerSocket");
+			t.start();
 		}catch(Exception e){
 			logger.warning(e.toString());
 			e.printStackTrace();
 		}
-	
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -68,7 +81,9 @@ public class Kamisado_Server_Model{
 		initPlayerWhite.put("start", false);
 		
 		this.send(initPlayerBlack.toString(), 'B');
-		this.send(initPlayerWhite.toString(), 'W');		
+		this.send(initPlayerWhite.toString(), 'W');
+		
+		this.newMsgGui.set("Game started - Black Player has got the first move");
 	}
 
 	public void send(String msg, char plCol){
@@ -228,7 +243,6 @@ public class Kamisado_Server_Model{
 	}
 	
 	public void initGameBoard(){
-		
 		this.gameboard = new FieldColor[boardSize][boardSize];
 		
 		this.gameboard[0][0] = FieldColor.BROWN;
@@ -302,6 +316,17 @@ public class Kamisado_Server_Model{
 		this.gameboard[5][7] = FieldColor.RED;
 		this.gameboard[6][7] = FieldColor.GREEN;
 		this.gameboard[7][7] = FieldColor.BROWN;
+	}
+	
+	public String getIP(){
+		String ip = "Couldn't get IP - sorry";
+        try {
+			ip = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+        return ip;
 	}
 
 }

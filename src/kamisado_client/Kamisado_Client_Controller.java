@@ -14,7 +14,7 @@ public class Kamisado_Client_Controller {
 	final private Kamisado_Client_View view;
 	private boolean running = true;	
 	
-	protected Kamisado_Client_Controller(Kamisado_Client_Model model, Kamisado_Client_View view){
+	public Kamisado_Client_Controller(Kamisado_Client_Model model, Kamisado_Client_View view){
 		this.model = model;
 		this.view = view;
 		

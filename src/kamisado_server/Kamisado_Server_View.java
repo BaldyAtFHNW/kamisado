@@ -1,9 +1,13 @@
 package kamisado_server;
 
+import java.net.InetAddress;
 import java.util.logging.Logger;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -29,6 +33,8 @@ public class Kamisado_Server_View {
 		
 		startSrv = new Button("Start Server");
 		endSrv = new Button("End Server");
+		Label ip = new Label("Your IP: " + model.getIP());
+		ip.setPadding(new Insets(5,0,0,5));;
 		
 		info = new TextArea();
 		info.setEditable(false);
@@ -38,7 +44,7 @@ public class Kamisado_Server_View {
         imgView.setFitHeight(200);
         imgView.setFitWidth(600);
 		
-        topHBox.getChildren().addAll(startSrv, endSrv);
+        topHBox.getChildren().addAll(startSrv, endSrv, ip);
         root.setTop(topHBox);
         root.setCenter(info);
 		root.setBottom(imgView);		
@@ -46,6 +52,13 @@ public class Kamisado_Server_View {
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
 		stage.setTitle("Kamisado Server");
+		stage.getIcons().add(new Image("/shortyNBaldy.png"));
+		stage.setWidth(605);
+		stage.setResizable(false);
+		
+		for(int i = 0; i<50; i++) {
+			info.appendText("adsf\n");
+		}
 	}
 
 	public void start() {

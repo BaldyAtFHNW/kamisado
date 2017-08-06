@@ -13,7 +13,7 @@ public class Kamisado_Client_View {
 	private Kamisado_Client_Model model;
 	protected Button btnClick;
 	
-	protected Kamisado_Client_View(Stage stage, Kamisado_Client_Model model){
+	public Kamisado_Client_View(Stage stage, Kamisado_Client_Model model){
 		this.stage = stage;
 		this.model = model;
 		

@@ -21,7 +21,6 @@ public class Kamisado_Server_Controller{
 		model.newMsgGui.addListener( (o, oldValue, newValue) -> view.info.appendText(newValue + "\n"));
 		view.startSrv.setOnAction((event)->{
 			model.connectClients();
-			model.initGame();
 		});
 		view.endSrv.setOnAction((event)->{
 			view.stop();
@@ -36,7 +35,7 @@ public class Kamisado_Server_Controller{
 		switch (type) {
 	        case "move":			processMove(json, plColor);
 	        	break;
-	        case "end":				processEnd(json, plColor);// surrendering
+	        case "end":				processEnd(json, plColor);// can only be surrendering
         	break;
 	        default: 				logger.warning("Invalid Type");
 		}
