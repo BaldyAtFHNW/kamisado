@@ -3,8 +3,11 @@ package kamisado_client;
 import javafx.scene.Scene;
 import java.util.logging.Logger;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class Kamisado_Client_View {
@@ -21,16 +24,31 @@ public class Kamisado_Client_View {
 		btnClick = new Button(); //Only an example for showing in the controller how to register for events
 		
 		BorderPane root = new BorderPane();
-		Label one = new Label (" one ");
-		Label two = new Label (" two ");
-		Label three = new Label (" three ");
-		Label four = new Label (" four ");
-		Label five = new Label (" five ");
-		root.setTop(one);
-		root.setBottom(two);
-		root.setLeft(three);
-		root.setRight(four);
-		root.setCenter(five);
+		GridPane gameBoard = new GridPane(); // Kamisado game board
+		root.setCenter(gameBoard);
+		
+		HBox upperScreen = new HBox(); // upper part of the game screen for buttons
+		root.setTop(upperScreen); 
+		Button resetGame = new Button("ResetGame");
+		Button giveUp = new Button("Give Up");
+		ComboBox<String> language = new ComboBox<String>(); // drop-down menu to change language in the game
+		language.getItems().addAll("DE", "EN");
+		Label moveWait = new Label("Move / Wait");
+		upperScreen.getChildren().addAll(resetGame, giveUp, moveWait, language);
+		
+		for (int row = 0; row < 8; row++){
+			for (int col = 0; col < 8; col++){
+				Label lblTemp = new Label(row + " , " + col);
+				gameBoard.add(lblTemp, col, row);
+			}
+		}
+		Label lblBottom = new Label("Bottom");
+		root.setBottom(lblBottom);
+		Label lblLeft = new Label("Left");
+		root.setLeft(lblLeft);
+		Label lblRight = new Label("Right");
+		root.setRight(lblRight);
+
 		
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add(
