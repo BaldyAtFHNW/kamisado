@@ -5,12 +5,12 @@ import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Kamisado_Server_Controller{
+public class KamisadoServerController{
 	private Logger logger = Logger.getLogger("");
-	private Kamisado_Server_Model model;
-	private Kamisado_Server_View view;
+	private KamisadoServerModel model;
+	private KamisadoServerView view;
 	
-	public Kamisado_Server_Controller(Kamisado_Server_Model model, Kamisado_Server_View view){
+	public KamisadoServerController(KamisadoServerModel model, KamisadoServerView view){
 		this.model = model;
 		this.view = view;
 		

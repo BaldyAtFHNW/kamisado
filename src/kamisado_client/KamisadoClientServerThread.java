@@ -5,13 +5,13 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.logging.Logger;
 
-public class Kamisado_Client_ServerThread implements Runnable{
+public class KamisadoClientServerThread implements Runnable{
 	Logger logger = Logger.getLogger("");
 	
-	private Kamisado_Client_Model model;
+	private KamisadoClientModel model;
 	private Socket serverSocket;
 	
-	public Kamisado_Client_ServerThread(Kamisado_Client_Model model, Socket serverSocket){
+	public KamisadoClientServerThread(KamisadoClientModel model, Socket serverSocket){
 		this.model = model;
 		this.serverSocket = serverSocket;
 	}

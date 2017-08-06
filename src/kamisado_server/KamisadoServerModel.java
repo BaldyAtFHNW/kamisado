@@ -13,7 +13,7 @@ import org.json.simple.parser.JSONParser;
 
 import javafx.beans.property.SimpleStringProperty;
 
-public class Kamisado_Server_Model{
+public class KamisadoServerModel{
 	Logger logger = Logger.getLogger("");
 	
 	final int boardSize = 8;
@@ -43,13 +43,13 @@ public class Kamisado_Server_Model{
 						//Connect 1st Player
 						socketPlB = listener.accept();
 						newMsgGui.set("Player1 (black) connected: " + socketPlB.toString());
-						Kamisado_Server_ClientThread clientPlayerBlack = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlB, true);
+						KamisadoServerClientThread clientPlayerBlack = new KamisadoServerClientThread(KamisadoServerModel.this, socketPlB, true);
 						new Thread(clientPlayerBlack).start();
 						
 						//Connect 2nd Player
 						socketPlW = listener.accept();
 						newMsgGui.set("Player2 (white) connected: " + socketPlW.toString());
-						Kamisado_Server_ClientThread clientPlayerWhite = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlW, false);
+						KamisadoServerClientThread clientPlayerWhite = new KamisadoServerClientThread(KamisadoServerModel.this, socketPlW, false);
 						new Thread(clientPlayerWhite).start();
 						
 						listener.close();

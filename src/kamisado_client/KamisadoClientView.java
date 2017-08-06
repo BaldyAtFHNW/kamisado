@@ -17,10 +17,10 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class Kamisado_Client_View {
+public class KamisadoClientView {
 	private Logger logger = Logger.getLogger("");
 	private Stage stage;
-	private Kamisado_Client_Model model;
+	private KamisadoClientModel model;
 	protected Button btnClick;
 	protected Button resetGame;
 	protected Button giveUp;
@@ -40,7 +40,7 @@ public class Kamisado_Client_View {
 	public static final double SCALEDOWN = 0.42;
 
 	
-	public Kamisado_Client_View(Stage stage, Kamisado_Client_Model model){
+	public KamisadoClientView(Stage stage, KamisadoClientModel model){
 		this.stage = stage;
 		this.model = model;
 		

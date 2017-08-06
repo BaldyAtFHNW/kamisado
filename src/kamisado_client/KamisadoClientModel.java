@@ -7,11 +7,14 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 
 import javafx.beans.property.SimpleStringProperty;
 
-public class Kamisado_Client_Model {
+public class KamisadoClientModel {
 	final public String ipAddress;
 	final private int port = 50000;
 	private Logger logger = Logger.getLogger("");
@@ -23,7 +26,7 @@ public class Kamisado_Client_Model {
 	public boolean black;
 	public String opponent;
 	
-	public Kamisado_Client_Model(String ip, String playerName) {
+	public KamisadoClientModel(String ip, String playerName) {
 		this.ipAddress = ip;
 		this.playerName = playerName;
 	}
@@ -34,9 +37,15 @@ public class Kamisado_Client_Model {
 		}catch(Exception e){
 			logger.warning(e.toString());
 			e.printStackTrace();
+			
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Server Not Found");
+			alert.setHeaderText("Please check IP and start again.");
+			alert.showAndWait();
+			Platform.exit();
 		}
 		
-		Kamisado_Client_ServerThread server = new Kamisado_Client_ServerThread(Kamisado_Client_Model.this, serverSocket);
+		KamisadoClientServerThread server = new KamisadoClientServerThread(KamisadoClientModel.this, serverSocket);
 		new Thread(server).start();	
 	}
 

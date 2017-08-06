@@ -8,13 +8,13 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import javafx.application.Platform;
 
-public class Kamisado_Client_Controller {
+public class KamisadoClientController {
 	private Logger logger = Logger.getLogger("");
-	final private Kamisado_Client_Model model;
-	final private Kamisado_Client_View view;
+	final private KamisadoClientModel model;
+	final private KamisadoClientView view;
 	private boolean running = true;	
 	
-	public Kamisado_Client_Controller(Kamisado_Client_Model model, Kamisado_Client_View view){
+	public KamisadoClientController(KamisadoClientModel model, KamisadoClientView view){
 		this.model = model;
 		this.view = view;
 		
