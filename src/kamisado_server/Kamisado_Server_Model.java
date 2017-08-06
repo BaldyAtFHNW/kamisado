@@ -1,13 +1,13 @@
 package kamisado_server;
 
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import javafx.beans.property.SimpleStringProperty;
 
@@ -15,35 +15,35 @@ public class Kamisado_Server_Model{
 	Logger logger = Logger.getLogger("");
 	
 	final int boardSize = 8;
-	FieldColor[][] gameboard;
-	TowerColor[][] towerPositions;;
+	private FieldColor[][] gameboard;
+	private TowerColor[][] towerPositions;;
 	
-	private Socket socketPlayer1;
-	private Socket socketPlayer2;	
+	private Socket socketPlB;
+	private Socket socketPlW;	
 	
-	protected SimpleStringProperty newestMsgP1 = new SimpleStringProperty();
-	protected SimpleStringProperty newestMsgP2 = new SimpleStringProperty();
+	protected SimpleStringProperty newestMsgPlBlack = new SimpleStringProperty();
+	protected SimpleStringProperty newestMsgPlWhite = new SimpleStringProperty();
 	
-	public Kamisado_Server_Model(){
-		//empty constructor can be deleted if not needed in the end
-	}
+	protected SimpleStringProperty newMsgGui = new SimpleStringProperty();
 	
 	public void connectClients(){
-
+		
 		try{
 			ServerSocket listener = new ServerSocket(50000, 10, null);
 			
-			this.socketPlayer1 = listener.accept();
-			logger.info("Player1 connected");
-			Kamisado_Server_ClientThread clientPlayer1 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer1, true);
-			new Thread(clientPlayer1).start();			
+			this.socketPlB = listener.accept();
+			logger.info("Player1 (black) connected");
+			Kamisado_Server_ClientThread clientPlayerBlack = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlB, true);
+			new Thread(clientPlayerBlack).start();
 			
-			this.socketPlayer2 = listener.accept();
-			logger.info("Player2 connected");
-			Kamisado_Server_ClientThread clientPlayer2 = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlayer2, false);
-			new Thread(clientPlayer2).start();
+			this.socketPlW = listener.accept();
+			logger.info("Player2 (white) connected");
+			Kamisado_Server_ClientThread clientPlayerWhite = new Kamisado_Server_ClientThread(Kamisado_Server_Model.this, socketPlW, false);
+			new Thread(clientPlayerWhite).start();
 			
 			listener.close();
+			
+			newMsgGui.set("Black Player: " + socketPlB.toString() + "\nWhite Player: " + socketPlB.toString());
 			
 		}catch(Exception e){
 			logger.warning(e.toString());
@@ -52,44 +52,159 @@ public class Kamisado_Server_Model{
 	
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void initGame(){
 		this.initGameBoard();
 		this.initTowers();
 		
-		JSONObject initP1 = new JSONObject();
-		initP1.put("type", "init");
-		initP1.put("black", true);
-		initP1.put("start", true);
+		JSONObject initPlayerBlack = new JSONObject();
+		initPlayerBlack.put("type", "init");
+		initPlayerBlack.put("black", true);
+		initPlayerBlack.put("start", true);
 		
-		JSONObject initP2 = new JSONObject();
-		initP2.put("type", "init");
-		initP2.put("black", false);
-		initP2.put("start", false);
+		JSONObject initPlayerWhite = new JSONObject();
+		initPlayerWhite.put("type", "init");
+		initPlayerWhite.put("black", false);
+		initPlayerWhite.put("start", false);
 		
-		this.send(initP1.toString(), true);
-		this.send(initP2.toString(), false);		
+		this.send(initPlayerBlack.toString(), 'B');
+		this.send(initPlayerWhite.toString(), 'W');		
 	}
 
-	public void send(String msg, boolean player1){
+	public void send(String msg, char plCol){
 		OutputStreamWriter out;
 		try {
-			if(player1){
-				out = new OutputStreamWriter(this.socketPlayer1.getOutputStream());
-			}else{
-				out = new OutputStreamWriter(this.socketPlayer2.getOutputStream());
+			if(plCol == 'B'){
+				out = new OutputStreamWriter(this.socketPlB.getOutputStream());
+				out.write(msg + "\n");
+				out.flush();
+			}else if(plCol == 'W'){
+				out = new OutputStreamWriter(this.socketPlW.getOutputStream());
+				out.write(msg + "\n");
+				out.flush();
+			}else {
+				logger.warning("Receiver does not exist!");
 			}
-			out.write(msg + "\n");
-			out.flush();
 		} catch (Exception e) {
 			logger.info(e.toString());
 			e.printStackTrace();
-
 		}
+	}
+	
+	public void printTowerPos(TowerColor towerColor) {
+		Integer[] pos = this.getTowerPos(towerColor);
+		logger.info(towerColor.toString() + " is located at: " + pos[0] + " " + pos[1]);
+	}
+	
+	public Integer[] getTowerPos(TowerColor towerColor) {
+		Integer[] towerPos = new Integer[2];
+		for(int x = 0; x < 8; x++) {
+			for(int y = 0; y < 8; y++) {
+				if(this.towerPositions[x][y] != null) {
+					if(this.towerPositions[x][y].toString().equals(towerColor.toString())) {
+						towerPos[0] = x;
+						towerPos[1] = y;
+					}
+				}
+			}
+		}
+		return towerPos;
+	}
+	
+	public void moveTower(TowerColor towerColor, int xPos, int yPos) {
+		//logger.info("Moving " + towerColor.toString() + " to: " + xPos + " " + yPos);
+		
+		//Remove the tower from old position
+		int x = getTowerPos(towerColor)[0];
+		int y = getTowerPos(towerColor)[1];
+		this.towerPositions[x][y] = null;
+
+		//Put tower to new positions
+		if(this.towerPositions[xPos][yPos] != null) {
+			logger.warning("Field already taken!");
+		}else {this.towerPositions[xPos][yPos] = towerColor;}
+	}
+	
+	public FieldColor getFieldColor(int xPos, int yPos) {
+		return this.gameboard[xPos][yPos];
+	}
+	
+	@SuppressWarnings("unchecked")
+	public JSONArray getPossibleMoves(TowerColor towerColor) {
+		Integer[] currentPos = this.getTowerPos(towerColor);
+		char color = towerColor.toString().charAt(0); //Either W or B
+		int currX = currentPos[0];
+		int currY = currentPos[1];
+		
+		JSONArray possibleMoves = new JSONArray();
+		//get LEFT diagonals
+		int x = currX; int y = currY;
+		do {
+			if(color == 'W') {x--; y++;}else {x--; y--;} 	//White and Black Player's moves have to be calculated differently
+			if(x < 0 || x > 7 || y < 0 || y > 7) {;break;} 	//Otherwise out of Gameboard
+			if(this.towerPositions[x][y] == null) {
+				JSONObject move = new JSONObject();
+				move.put("xPos", x);
+				move.put("yPos", y);
+				possibleMoves.add(move);
+			}
+		}while(this.towerPositions[x][y] == null);
+
+		//get RIGHT diagonals
+		x = currX; y = currY;
+		do {
+			if(color == 'W') {x++; y++;}else {x++; y--;}	//White and Black Player's moves have to be calculated differently
+			if(x < 0 || x > 7 || y < 0 || y > 7) {;break;} 	//Otherwise out of Gameboard
+			if(this.towerPositions[x][y] == null) {
+				JSONObject move = new JSONObject();
+				move.put("xPos", x);
+				move.put("yPos", y);
+				possibleMoves.add(move);
+			}
+		}while(this.towerPositions[x][y] == null);
+		
+		//get HORIZONTALS
+		x = currX; y = currY;
+		do {
+			if(color == 'W') {y++;}else {y--;}				//White and Black Player's moves have to be calculated differently
+			if(x < 0 || x > 7 || y < 0 || y > 7) {;break;} 	//Otherwise out of Gameboard
+			if(this.towerPositions[x][y] == null) {
+				JSONObject move = new JSONObject();
+				move.put("xPos", x);
+				move.put("yPos", y);
+				possibleMoves.add(move);
+			}
+		}while(this.towerPositions[x][y] == null);
+		
+		return possibleMoves;
+	}
+	
+	public JSONObject parseJSON(String msg){
+		JSONParser parser = new JSONParser();
+		JSONObject json = new JSONObject();
+		
+		try {
+			Object obj = parser.parse(msg);
+			json = (JSONObject) obj;
+		} catch (Exception e) {
+			logger.warning(e.toString());
+			e.printStackTrace();
+		}
+		return json;
 	}
 	
 	public void initTowers(){
 		
 		this.towerPositions = new TowerColor[boardSize][boardSize];
+		
+		//Set all positions to null
+		for(int x = 0; x < 8; x++) {
+			for(int y = 0; y < 8; y++) {
+				this.towerPositions[x][y] = null;
+			}
+		}
+		
+		//Put the towers on the gameboard
 		
 		//white player tower positions
 		this.towerPositions[0][0] = TowerColor.WBROWN;
