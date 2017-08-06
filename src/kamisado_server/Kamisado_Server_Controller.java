@@ -33,11 +33,25 @@ public class Kamisado_Server_Controller{
 		String type = (String) json.get("type");
 		
 		switch (type) {
+			case "introduction":	processIntroduction(json, plColor);
+				break;
 	        case "move":			processMove(json, plColor);
 	        	break;
 	        case "end":				processEnd(json, plColor);// can only be surrendering
-        	break;
+        		break;
 	        default: 				logger.warning("Invalid Type");
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void processIntroduction(JSONObject json, char plColor){
+		String name = (String) json.get("name");
+		if(plColor == 'B') {
+			model.setNamePlB(name);
+			view.info.appendText("Black Player's name: " + name +"\n");
+		}else {
+			model.setNamePlW(name);
+			view.info.appendText("White Player's name: " + name + "\n");
 		}
 	}
 	

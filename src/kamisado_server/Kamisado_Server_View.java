@@ -51,14 +51,10 @@ public class Kamisado_Server_View {
 		
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
-		stage.setTitle("Kamisado Server");
+		stage.setTitle("Kamisado by ShortyNBaldy - Server");
 		stage.getIcons().add(new Image("/shortyNBaldy.png"));
 		stage.setWidth(605);
 		stage.setResizable(false);
-		
-		for(int i = 0; i<50; i++) {
-			info.appendText("adsf\n");
-		}
 	}
 
 	public void start() {

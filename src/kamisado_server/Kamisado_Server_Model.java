@@ -22,8 +22,11 @@ public class Kamisado_Server_Model{
 	
 	ServerSocket listener;
 	private Socket socketPlB;
-	private Socket socketPlW;	
+	private Socket socketPlW;
 	
+	protected String namePlB;
+	protected String namePlW;
+
 	protected SimpleStringProperty newestMsgPlBlack = new SimpleStringProperty();
 	protected SimpleStringProperty newestMsgPlWhite = new SimpleStringProperty();
 	
@@ -50,6 +53,8 @@ public class Kamisado_Server_Model{
 						new Thread(clientPlayerWhite).start();
 						
 						listener.close();
+						
+						Thread.sleep(5000); //Let first the introductions arrive
 					}catch(Exception e){
 						logger.warning(e.toString());
 						e.printStackTrace();
@@ -70,15 +75,19 @@ public class Kamisado_Server_Model{
 		this.initGameBoard();
 		this.initTowers();
 		
+		logger.info("Name White Player: " + namePlW);
 		JSONObject initPlayerBlack = new JSONObject();
 		initPlayerBlack.put("type", "init");
 		initPlayerBlack.put("black", true);
 		initPlayerBlack.put("start", true);
+		initPlayerBlack.put("opponent", namePlW);
 		
+		logger.info("Name Black Player: " + namePlB);
 		JSONObject initPlayerWhite = new JSONObject();
 		initPlayerWhite.put("type", "init");
 		initPlayerWhite.put("black", false);
 		initPlayerWhite.put("start", false);
+		initPlayerWhite.put("opponent", namePlB);
 		
 		this.send(initPlayerBlack.toString(), 'B');
 		this.send(initPlayerWhite.toString(), 'W');
@@ -126,9 +135,7 @@ public class Kamisado_Server_Model{
 		return towerPos;
 	}
 	
-	public void moveTower(TowerColor towerColor, int xPos, int yPos) {
-		//logger.info("Moving " + towerColor.toString() + " to: " + xPos + " " + yPos);
-		
+	public void moveTower(TowerColor towerColor, int xPos, int yPos) {		
 		//Remove the tower from old position
 		int x = getTowerPos(towerColor)[0];
 		int y = getTowerPos(towerColor)[1];
@@ -316,6 +323,22 @@ public class Kamisado_Server_Model{
 		this.gameboard[5][7] = FieldColor.RED;
 		this.gameboard[6][7] = FieldColor.GREEN;
 		this.gameboard[7][7] = FieldColor.BROWN;
+	}
+	
+	public String getNamePlB() {
+		return namePlB;
+	}
+
+	public void setNamePlB(String namePlB) {
+		this.namePlB = namePlB;
+	}
+
+	public String getNamePlW() {
+		return namePlW;
+	}
+
+	public void setNamePlW(String namePlW) {
+		this.namePlW = namePlW;
 	}
 	
 	public String getIP(){

@@ -29,8 +29,18 @@ public class Kamisado_Client_Controller {
 		});		
 		
 		model.newestMsg.addListener( (o, oldValue, newValue) -> processMsg(newValue));
+		logger.info(model.ipAddress);
 		model.connectServer();
+		sendNameToServer();
 
+	}
+	
+	public void sendNameToServer() {
+		JSONObject json = new JSONObject();
+		json.put("type", "introduction");
+		json.put("name", model.getPlayerName());
+		
+		model.send(json.toString());
 	}
 	
 	private void processMsg(String msg) {
@@ -52,6 +62,7 @@ public class Kamisado_Client_Controller {
 	
 	private void processInit(JSONObject json) {
 		model.black = (boolean) json.get("black");
+		model.opponent = (String) json.get("opponent");
 		if((boolean) json.get("start")) {
 			view.firstMove();
 		}
