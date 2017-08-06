@@ -19,22 +19,19 @@ public class Kamisado_Client_View {
 	private Stage stage;
 	private Kamisado_Client_Model model;
 	protected Button btnClick;
-	
+	protected Button resetGame;
+	protected Button giveUp;
+	protected ComboBox<String> language;
+	protected Label moveWait;
+	protected BorderPane root;
+	protected GridPane gameBoard;
+
 	public static final int FIELD_SIZE = 70;
 	public static final int WIDTH = 10;
 	public static final int HEIGHT = 8;
 	public static final double SCALEDOWN = 0.42;
-//	private Rectangle field;
+
 	
-		
-	// creates new field for the board
-	/*public Rectangle getField (Rectangle field) {
-		this.field = new Rectangle();
-		field.setWidth(FIELD_SIZE);
-		field.setHeight(FIELD_SIZE);
-		field.setFill(Color.BLUE);
-		return field;
-	}*/
 	protected Kamisado_Client_View(Stage stage, Kamisado_Client_Model model){
 		this.stage = stage;
 		this.model = model;
@@ -44,34 +41,23 @@ public class Kamisado_Client_View {
 		//View Stuff goes here
 		btnClick = new Button(); //Only an example for showing in the controller how to register for events
 		
-		BorderPane root = new BorderPane();
-		GridPane gameBoard = new GridPane(); // Kamisado game board
+		root = new BorderPane();
+		gameBoard = new GridPane(); // Kamisado game board
 		gameBoard.setGridLinesVisible(true);
 	
 		HBox upperScreen = new HBox(); // upper part of the game screen for buttons
 		root.setTop(upperScreen); 
-		Button resetGame = new Button("ResetGame");
-		Button giveUp = new Button("Give Up");
-		ComboBox<String> language = new ComboBox<String>(); // drop-down menu to change language in the game
+		resetGame = new Button("ResetGame");
+		giveUp = new Button("Give Up");
+		language = new ComboBox<String>(); // drop-down menu to change language in the game
 		language.getItems().addAll("DE", "EN");
-		Label moveWait = new Label("Move / Wait");
+		moveWait = new Label("Move / Wait");
 		upperScreen.getChildren().addAll(resetGame, giveUp, moveWait, language);
 		
 		
 		
 		
-		/*
-		for (int row = 0; row < WIDTH; row++){
-			for (int col = 0; col < HEIGHT; col++){
-			Rectangle field = new Rectangle();
-				field.setWidth(FIELD_SIZE);
-				field.setHeight(FIELD_SIZE);
-				field.setStroke(Color.BEIGE);
-				
-				gameBoard.add(field, row, col);
-			}
-			*/
-		// first row
+	// first row
 		Rectangle a = new Rectangle();
 		a.setWidth(FIELD_SIZE);
 		a.setHeight(FIELD_SIZE);
