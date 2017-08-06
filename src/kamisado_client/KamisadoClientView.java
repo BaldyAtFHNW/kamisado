@@ -2,12 +2,15 @@ package kamisado_client;
 
 import java.util.logging.Logger;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -661,6 +664,26 @@ public class KamisadoClientView {
 	
 	public Stage getStage(){
 		return stage;
+	}
+
+
+	public void showEnd(boolean won, String reason) {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Game Ended");
+		
+		if(won) {
+			alert.setHeaderText("Congratulations, you won!!!");
+		}else {
+			alert.setHeaderText("Sorry, you lost :(");
+		}
+		
+		if(reason.equals("surrender")) {
+			alert.setContentText("Your opponent gave up...");
+		}else {
+			alert.setContentText("You managed to put a tower to the other baseline :)");
+		}
+		alert.showAndWait();
+		this.stop();
 	}
 
 }
