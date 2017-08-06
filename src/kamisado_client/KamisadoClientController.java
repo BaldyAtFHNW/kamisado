@@ -76,6 +76,12 @@ public class KamisadoClientController {
 		String movedTower = (String) json.get("movedTower");
 		int newXPos = (int) json.get("xPos");
 		int newYPos = (int) json.get("yPos");
+		if(model.black) { //this is the black client
+			newXPos = model.turnUpsideDown(newXPos);
+		}else {
+			newYPos = model.turnUpsideDown(newYPos);
+		}
+		
 		//view.moveTower(movedTower, newXPos, newYPos);									<--------- does not exist yet
 		
 		//Highlight possible moves ----- (Highlight fields and make them clickable)
