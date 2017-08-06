@@ -21,8 +21,9 @@ public class Kamisado_Client_View {
 	protected Button btnClick;
 	
 	public static final int FIELD_SIZE = 70;
-	public static final int WIDTH = 8;
+	public static final int WIDTH = 10;
 	public static final int HEIGHT = 8;
+	public static final double SCALEDOWN = 0.42;
 //	private Rectangle field;
 	
 		
@@ -75,7 +76,6 @@ public class Kamisado_Client_View {
 		a.setWidth(FIELD_SIZE);
 		a.setHeight(FIELD_SIZE);
 		a.setFill(Color.ORANGE);
-		a.setStroke(Color.BLACK);
 		gameBoard.add(a, 0, 0);
 		
 		Rectangle b = new Rectangle();
@@ -476,11 +476,105 @@ public class Kamisado_Client_View {
 				ppp.setFill(Color.YELLOW);
 				gameBoard.add(ppp, 0, 4);
 				
-		
-		Circle bOrange = new Circle(FIELD_SIZE * 0.45);
+// black towers		
+		Circle bOrange = new Circle(FIELD_SIZE * SCALEDOWN);
 		bOrange.setFill(Color.ORANGE);
 		bOrange.setStroke(Color.BLACK);
+		bOrange.setStrokeWidth(WIDTH);
 		gameBoard.add(bOrange, 0, 0);
+		
+		Circle bBlue = new Circle(FIELD_SIZE * SCALEDOWN);
+		bBlue.setFill(Color.BLUE);
+		bBlue.setStroke(Color.BLACK);
+		bBlue.setStrokeWidth(WIDTH);
+		gameBoard.add(bBlue, 1, 0);
+		
+		Circle bPurple = new Circle(FIELD_SIZE * SCALEDOWN);
+		bPurple.setFill(Color.PURPLE);
+		bPurple.setStroke(Color.BLACK);
+		bPurple.setStrokeWidth(WIDTH);
+		gameBoard.add(bPurple, 2, 0);
+		
+		Circle bPink = new Circle(FIELD_SIZE * SCALEDOWN);
+		bPink.setFill(Color.PINK);
+		bPink.setStroke(Color.BLACK);
+		bPink.setStrokeWidth(WIDTH);
+		gameBoard.add(bPink, 3, 0);
+		
+		Circle bYellow = new Circle(FIELD_SIZE * SCALEDOWN);
+		bYellow.setFill(Color.YELLOW);
+		bYellow.setStroke(Color.BLACK);
+		bYellow.setStrokeWidth(WIDTH);
+		gameBoard.add(bYellow, 4, 0);
+				
+		Circle bRed = new Circle(FIELD_SIZE * SCALEDOWN);
+		bRed.setFill(Color.RED);
+		bRed.setStroke(Color.BLACK);
+		bRed.setStrokeWidth(WIDTH);
+		gameBoard.add(bRed,5, 0);
+		
+		Circle bGreen = new Circle(FIELD_SIZE * SCALEDOWN);
+		bGreen.setFill(Color.GREEN);
+		bGreen.setStroke(Color.BLACK);
+		bGreen.setStrokeWidth(WIDTH);
+		gameBoard.add(bGreen, 6, 0);
+		
+		Circle bBrown = new Circle(FIELD_SIZE * SCALEDOWN);
+		bBrown.setFill(Color.BROWN);
+		bBrown.setStroke(Color.BLACK);
+		bBrown.setStrokeWidth(WIDTH);
+		gameBoard.add(bBrown, 7, 0);
+		
+	//white towers
+		Circle wOrange = new Circle(FIELD_SIZE * SCALEDOWN);
+		wOrange.setFill(Color.ORANGE);
+		wOrange.setStroke(Color.WHITE);
+		wOrange.setStrokeWidth(WIDTH);
+		gameBoard.add(wOrange, 7, 7);
+		
+		Circle wBlue = new Circle(FIELD_SIZE * SCALEDOWN);
+		wBlue.setFill(Color.BLUE);
+		wBlue.setStroke(Color.WHITE);
+		wBlue.setStrokeWidth(WIDTH);
+		gameBoard.add(wBlue, 6, 7);
+		
+		Circle wPurple = new Circle(FIELD_SIZE * SCALEDOWN);
+		wPurple.setFill(Color.PURPLE);
+		wPurple.setStroke(Color.WHITE);
+		wPurple.setStrokeWidth(WIDTH);
+		gameBoard.add(wPurple, 5, 7);
+		
+		Circle wPink = new Circle(FIELD_SIZE * SCALEDOWN);
+		wPink.setFill(Color.PINK);
+		wPink.setStroke(Color.WHITE);
+		wPink.setStrokeWidth(WIDTH);
+		gameBoard.add(wPink, 4, 7);
+		
+		Circle wYellow = new Circle(FIELD_SIZE * SCALEDOWN);
+		wYellow.setFill(Color.YELLOW);
+		wYellow.setStroke(Color.WHITE);
+		wYellow.setStrokeWidth(WIDTH);
+		gameBoard.add(wYellow, 3, 7);
+				
+		Circle wRed = new Circle(FIELD_SIZE * SCALEDOWN);
+		wRed.setFill(Color.RED);
+		wRed.setStroke(Color.WHITE);
+		wRed.setStrokeWidth(WIDTH);
+		gameBoard.add(wRed,  2, 7);
+		
+		Circle wGreen = new Circle(FIELD_SIZE * SCALEDOWN);
+		wGreen.setFill(Color.GREEN);
+		wGreen.setStroke(Color.WHITE);
+		wGreen.setStrokeWidth(WIDTH);
+		gameBoard.add(wGreen, 1, 7);
+		
+		Circle wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
+		wBrown.setFill(Color.BROWN);
+		wBrown.setStroke(Color.WHITE);
+		wBrown.setStrokeWidth(WIDTH);
+		gameBoard.add(wBrown, 0, 7);
+		
+				
 		root.setCenter(gameBoard);
 		
 		Label lblBottom = new Label("Bottom");
@@ -491,6 +585,10 @@ public class Kamisado_Client_View {
 		root.setRight(lblRight);
 
 		
+				
+		root.setCenter(gameBoard);
+				
+	
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add(
                 getClass().getResource("layouts.css").toExternalForm());
