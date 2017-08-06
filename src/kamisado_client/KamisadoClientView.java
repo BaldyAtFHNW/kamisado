@@ -32,11 +32,11 @@ public class KamisadoClientView {
 	protected int newLocationCol;
 	protected int oldLocationRow;
 	protected int newLocationRow;
-	protected Circle wBrown;
+	//protected Circle wBrown;
 	
 	public static final int FIELD_SIZE = 70;
 	public static final int WIDTH = 10;
-	public static final int HEIGHT = 8;
+	public static final double HIGHLIGHT_WIDTH = 1.5;
 	public static final double SCALEDOWN = 0.42;
 
 	
@@ -47,7 +47,7 @@ public class KamisadoClientView {
 		
 	
 		//View Stuff goes here
-		btnClick = new Button(); //Only an example for showing in the controller how to register for events
+		btnClick = new Button(" Testing "); //Only an example for showing in the controller how to register for events
 		
 		root = new BorderPane();
 		gameBoard = new GridPane(); // Kamisado game board
@@ -55,13 +55,14 @@ public class KamisadoClientView {
 		//gameBoard.getColumnConstraints().addAll( new ColumnConstraints( FIELD_SIZE ), new ColumnConstraints( FIELD_SIZE ), new ColumnConstraints( FIELD_SIZE ) );
 	
 		HBox upperScreen = new HBox(); // upper part of the game screen for buttons
+		
 		root.setTop(upperScreen); 
 		resetGame = new Button("ResetGame");
 		giveUp = new Button("Give Up");
 		language = new ComboBox<String>(); // drop-down menu to change language in the game
 		language.getItems().addAll("DE", "EN");
 		moveWait = new Label("Move / Wait");
-		upperScreen.getChildren().addAll(resetGame, giveUp, moveWait, language);
+		upperScreen.getChildren().addAll(resetGame, giveUp, moveWait, language, btnClick);
 		
 				
 	// first row
@@ -563,7 +564,7 @@ public class KamisadoClientView {
 		wGreen.setStrokeWidth(WIDTH);
 		gameBoard.add(wGreen, 1, 7);
 		
-		wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
 		wBrown.setFill(Color.BROWN);
 		wBrown.setStroke(Color.WHITE);
 		wBrown.setStrokeWidth(WIDTH);
@@ -592,6 +593,12 @@ public class KamisadoClientView {
 			
 		});
 		
+		btnClick.setOnAction((event)->{
+				h.setStroke(Color.AQUA);
+				h.setStrokeWidth(HIGHLIGHT_WIDTH);
+			
+		});
+		
 	
 		
 		
@@ -604,6 +611,7 @@ public class KamisadoClientView {
 		
 	}
 
+	
 	
 	public void firstMove(){
 		//implement the first move here
