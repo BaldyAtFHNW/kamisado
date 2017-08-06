@@ -2,6 +2,8 @@ package kamisado_client;
 
 import java.util.logging.Logger;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -25,7 +27,12 @@ public class Kamisado_Client_View {
 	protected Label moveWait;
 	protected BorderPane root;
 	protected GridPane gameBoard;
-
+	protected int oldLocationCol;
+	protected int newLocationCol;
+	protected int oldLocationRow;
+	protected int newLocationRow;
+	protected Circle wBrown;
+	
 	public static final int FIELD_SIZE = 70;
 	public static final int WIDTH = 10;
 	public static final int HEIGHT = 8;
@@ -43,7 +50,8 @@ public class Kamisado_Client_View {
 		
 		root = new BorderPane();
 		gameBoard = new GridPane(); // Kamisado game board
-		gameBoard.setGridLinesVisible(true);
+	//	gameBoard.setGridLinesVisible(true);
+		//gameBoard.getColumnConstraints().addAll( new ColumnConstraints( FIELD_SIZE ), new ColumnConstraints( FIELD_SIZE ), new ColumnConstraints( FIELD_SIZE ) );
 	
 		HBox upperScreen = new HBox(); // upper part of the game screen for buttons
 		root.setTop(upperScreen); 
@@ -54,9 +62,7 @@ public class Kamisado_Client_View {
 		moveWait = new Label("Move / Wait");
 		upperScreen.getChildren().addAll(resetGame, giveUp, moveWait, language);
 		
-		
-		
-		
+				
 	// first row
 		Rectangle a = new Rectangle();
 		a.setWidth(FIELD_SIZE);
@@ -85,7 +91,7 @@ public class Kamisado_Client_View {
 		Rectangle e = new Rectangle();
 		e.setWidth(FIELD_SIZE);
 		e.setHeight(FIELD_SIZE);
-		e.setFill(Color.YELLOW);
+		e.setFill(Color.GOLD);
 		gameBoard.add(e, 4, 0);
 		
 		Rectangle f = new Rectangle();
@@ -143,7 +149,7 @@ public class Kamisado_Client_View {
 		Rectangle n = new Rectangle();
 		n.setWidth(FIELD_SIZE);
 		n.setHeight(FIELD_SIZE);
-		n.setFill(Color.YELLOW);
+		n.setFill(Color.GOLD);
 		gameBoard.add(n, 5, 1);
 				
 		Rectangle o = new Rectangle();
@@ -199,7 +205,7 @@ public class Kamisado_Client_View {
 		Rectangle x = new Rectangle();
 		x.setWidth(FIELD_SIZE);
 		x.setHeight(FIELD_SIZE);
-		x.setFill(Color.YELLOW);
+		x.setFill(Color.GOLD);
 		gameBoard.add(x, 6, 2);
 		
 		Rectangle y = new Rectangle();
@@ -256,7 +262,7 @@ public class Kamisado_Client_View {
 		Rectangle hh = new Rectangle();
 		hh.setWidth(FIELD_SIZE);
 		hh.setHeight(FIELD_SIZE);
-		hh.setFill(Color.YELLOW);
+		hh.setFill(Color.GOLD);
 		gameBoard.add(hh, 7, 3);
 		
 
@@ -289,7 +295,7 @@ public class Kamisado_Client_View {
 				Rectangle mm = new Rectangle();
 				mm.setWidth(FIELD_SIZE);
 				mm.setHeight(FIELD_SIZE);
-				mm.setFill(Color.YELLOW);
+				mm.setFill(Color.GOLD);
 				gameBoard.add(mm, 3, 7);
 				
 				Rectangle nn = new Rectangle();
@@ -347,7 +353,7 @@ public class Kamisado_Client_View {
 				Rectangle vv = new Rectangle();
 				vv.setWidth(FIELD_SIZE);
 				vv.setHeight(FIELD_SIZE);
-				vv.setFill(Color.YELLOW);
+				vv.setFill(Color.GOLD);
 				gameBoard.add(vv, 2, 6);
 						
 				Rectangle ww = new Rectangle();
@@ -403,7 +409,7 @@ public class Kamisado_Client_View {
 				Rectangle ggg = new Rectangle();
 				ggg.setWidth(FIELD_SIZE);
 				ggg.setHeight(FIELD_SIZE);
-				ggg.setFill(Color.YELLOW);
+				ggg.setFill(Color.GOLD);
 				gameBoard.add(ggg, 1, 5);
 				
 				Rectangle hhh = new Rectangle();
@@ -459,10 +465,12 @@ public class Kamisado_Client_View {
 				Rectangle ppp = new Rectangle();
 				ppp.setWidth(FIELD_SIZE);
 				ppp.setHeight(FIELD_SIZE);
-				ppp.setFill(Color.YELLOW);
+				ppp.setFill(Color.GOLD);
 				gameBoard.add(ppp, 0, 4);
 				
 // black towers		
+				
+
 		Circle bOrange = new Circle(FIELD_SIZE * SCALEDOWN);
 		bOrange.setFill(Color.ORANGE);
 		bOrange.setStroke(Color.BLACK);
@@ -488,7 +496,7 @@ public class Kamisado_Client_View {
 		gameBoard.add(bPink, 3, 0);
 		
 		Circle bYellow = new Circle(FIELD_SIZE * SCALEDOWN);
-		bYellow.setFill(Color.YELLOW);
+		bYellow.setFill(Color.GOLD);
 		bYellow.setStroke(Color.BLACK);
 		bYellow.setStrokeWidth(WIDTH);
 		gameBoard.add(bYellow, 4, 0);
@@ -536,8 +544,8 @@ public class Kamisado_Client_View {
 		wPink.setStrokeWidth(WIDTH);
 		gameBoard.add(wPink, 4, 7);
 		
-		Circle wYellow = new Circle(FIELD_SIZE * SCALEDOWN);
-		wYellow.setFill(Color.YELLOW);
+		Circle wYellow= new Circle(FIELD_SIZE * SCALEDOWN);
+		wYellow.setFill(Color.GOLD);
 		wYellow.setStroke(Color.WHITE);
 		wYellow.setStrokeWidth(WIDTH);
 		gameBoard.add(wYellow, 3, 7);
@@ -554,12 +562,11 @@ public class Kamisado_Client_View {
 		wGreen.setStrokeWidth(WIDTH);
 		gameBoard.add(wGreen, 1, 7);
 		
-		Circle wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
+		wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
 		wBrown.setFill(Color.BROWN);
 		wBrown.setStroke(Color.WHITE);
 		wBrown.setStrokeWidth(WIDTH);
 		gameBoard.add(wBrown, 0, 7);
-		
 				
 		root.setCenter(gameBoard);
 		
@@ -574,7 +581,19 @@ public class Kamisado_Client_View {
 				
 		root.setCenter(gameBoard);
 				
+		//add functionality to the reset button
+		
+		resetGame.setOnAction((event)->{
+			oldLocationCol = gameBoard.getColumnIndex(wBrown);
+			oldLocationRow = gameBoard.getRowIndex(wBrown);
+			gameBoard.setColumnIndex(wBrown, 5);
+			gameBoard.setRowIndex(wBrown, 2);
+			
+		});
+		
 	
+		
+		
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add(
                 getClass().getResource("layouts.css").toExternalForm());
@@ -583,6 +602,7 @@ public class Kamisado_Client_View {
 		
 	}
 
+	
 	public void firstMove(){
 		//implement the first move here
 		if(model.black) {
@@ -591,6 +611,8 @@ public class Kamisado_Client_View {
 			logger.info("First Move Here! I am the White player");
 		}
 	}
+	
+	
 	
 	public void start(){
 		stage.show();
@@ -603,5 +625,5 @@ public class Kamisado_Client_View {
 	public Stage getStage(){
 		return stage;
 	}
-	
+
 }
