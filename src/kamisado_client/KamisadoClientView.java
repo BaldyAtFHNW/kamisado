@@ -12,6 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -35,6 +36,7 @@ public class KamisadoClientView {
 	protected int newLocationCol;
 	protected int oldLocationRow;
 	protected int newLocationRow;
+	protected int rectCoordinates;
 	//protected Circle wBrown;
 	
 	public static final int FIELD_SIZE = 70;
@@ -619,15 +621,20 @@ public class KamisadoClientView {
 		});
 		
 		btnClick.setOnAction((event)->{
-				h.setStroke(Color.AQUA);
-				h.setStrokeWidth(HIGHLIGHT_WIDTH);
-			
+				//h.setStroke(Color.AQUA);
+				//h.setStrokeWidth(HIGHLIGHT_WIDTH);
+				int [][] gridNum = new int[2][2];
+				int row = gameBoard.getColumnIndex(wBrown);
+				int col = gameBoard.getRowIndex(wBrown);
+				gridNum[row][col] = rectCoordinates;
+				System.out.println("row is: " + row + "col is:" + col);
+		
 		});
 		
 		
 		
 		
-		Scene scene = new Scene(root);
+		Scene scene = new Scene(root, 800, 800);
 		scene.getStylesheets().add(
                 getClass().getResource("layouts.css").toExternalForm());
 		stage.setScene(scene);
@@ -635,19 +642,41 @@ public class KamisadoClientView {
 		stage.getIcons().add(new Image("/shortyNBaldy.png"));
 		
 	}
-
+		/*check if the ID of the tower equals to the name received, find it in the gridPane
+		 * remove it from the old position and place it to the new position
+		 * according to the coordinates received from the server
+		 * 
+		 * 
+		 * here I have a problem that I don't know how to tell remove the Circle Object
+		 * and place it to the new position. movedTower is String; I think I should use 
+		 * method instanceOf Circle or smth similar, but I don't know how to
+		 */
+		
 		public void moveTower(String movedTower, int newXPos, int newYPos) {
 			//gameBoard.getId().equalsTo().
 			//if (gameBoard.getID != null) {
-			String s = movedTower;
-			if (s.equals(gameBoard.getId())){
-				gameBoard.relocate(newXPos, newYPos);
+			if (movedTower.equals(gameBoard.getId())){
+				gameBoard.getChildren().remove(movedTower);				
+				gameBoard.setRowIndex(movedTower, newXPos);
+				gameBoard.setColumnIndex(movedTower, newYPos);
 				
-				//gameBoard.setRowIndex(movedTower, newXPos);
-				//gameBoard.setColumnIndex(movedTower, newYPos);
+				
 			}
 			}
+		/* Here I have a same problem. I was thinking to add all Rectangels to the array
+		 * When I receive the xPos yPos of the possible moves, it should find the rectangles
+		 * in these positions and set the strokes other color, so it looks highlighted.
+		 * 
+		 */
+
+		int[][] rectanglesInGrid = new int[8][8];
+		public void highlightField(int[][] rectanglesInGrid, int xPos, int yPos) {
 		
+		//		h.setStroke(Color.AQUA);
+		//		h.setStrokeWidth(HIGHLIGHT_WIDTH);
+			
+		
+		}
 
 
 	
@@ -673,7 +702,12 @@ public class KamisadoClientView {
 	public Stage getStage(){
 		return stage;
 	}
-
+		
+	Image congrats = new Image(getClass().getResourceAsStream("congrats.gif"));
+	ImageView imageViewWinner = new ImageView(congrats);
+	
+	Image youLost = new Image(getClass().getResourceAsStream("ha ha_0.5.jpg"));
+	ImageView imageViewLoser = new ImageView(youLost);
 
 	public void showEnd(boolean won, String reason) {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -681,8 +715,11 @@ public class KamisadoClientView {
 		
 		if(won) {
 			alert.setHeaderText("Congratulations, you won!!!");
+			alert.setGraphic(imageViewWinner);
+			
 		}else {
 			alert.setHeaderText("Sorry, you lost :(");
+			alert.setGraphic(imageViewLoser);
 		}
 		
 		if(reason.equals("surrender")) {
@@ -693,9 +730,5 @@ public class KamisadoClientView {
 		alert.showAndWait();
 		this.stop();
 	}
-	
-	public void highlightField(int xPos, int yPos) {
-	
 	}
-
-}
+	
