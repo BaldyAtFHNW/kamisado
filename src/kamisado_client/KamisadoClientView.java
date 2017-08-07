@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -34,13 +35,7 @@ public class KamisadoClientView {
 	protected Label moveWait;
 	protected BorderPane root;
 	protected GridPane gameBoard;
-	protected int oldLocationCol;
-	protected int newLocationCol;
-	protected int oldLocationRow;
-	protected int newLocationRow;
-	protected int rectCoordinates;
-	//protected Circle wBrown;
-	
+		
 	public static final int FIELD_SIZE = 70;
 	public static final int WIDTH = 10;
 	public static final double HIGHLIGHT_WIDTH = 1.5;
@@ -56,11 +51,10 @@ public class KamisadoClientView {
 		//View Stuff goes here
 		btnClick = new Button(" Testing "); //Only an example for showing in the controller how to register for events
 		
+		// arrange the client window
 		root = new BorderPane();
 		gameBoard = new GridPane(); // Kamisado game board
-	//	gameBoard.setGridLinesVisible(true);
-		//gameBoard.getColumnConstraints().addAll( new ColumnConstraints( FIELD_SIZE ), new ColumnConstraints( FIELD_SIZE ), new ColumnConstraints( FIELD_SIZE ) );
-	
+		root.setCenter(gameBoard); 
 		HBox upperScreen = new HBox(); // upper part of the game screen for buttons
 		
 		root.setTop(upperScreen); 
@@ -71,7 +65,7 @@ public class KamisadoClientView {
 		moveWait = new Label("Move / Wait");
 		upperScreen.getChildren().addAll(resetGame, giveUp, moveWait, language, btnClick);
 		
-				
+	// create fields for the gameboard and then set them to the specific position in the grid, all hardcoded			
 	// first row
 		Rectangle a = new Rectangle();
 		a.setWidth(FIELD_SIZE);
@@ -477,7 +471,7 @@ public class KamisadoClientView {
 				ppp.setFill(Color.GOLD);
 				gameBoard.add(ppp, 0, 4);
 				
-// black towers		
+// create black towers and set them to the initial position
 				
 
 		Circle bOrange = new Circle(FIELD_SIZE * SCALEDOWN);
@@ -536,7 +530,7 @@ public class KamisadoClientView {
 		bBrown.setId("BBROWN");
 		gameBoard.add(bBrown, 7, 0);
 		
-	//white towers
+	//create white towers and set them to the initial position
 		Circle wOrange = new Circle(FIELD_SIZE * SCALEDOWN);
 		wOrange.setFill(Color.ORANGE);
 		wOrange.setStroke(Color.WHITE);
@@ -593,8 +587,11 @@ public class KamisadoClientView {
 		wBrown.setId("WBROWN");
 		gameBoard.add(wBrown, 0, 7);
 				
-		root.setCenter(gameBoard);
 		
+
+
+		
+		//set the labels to the free parts of borderpane, maye we can add there smth later
 		Label lblBottom = new Label("Bottom");
 		root.setBottom(lblBottom);
 		Label lblLeft = new Label("Left");
@@ -602,38 +599,6 @@ public class KamisadoClientView {
 		Label lblRight = new Label("Right");
 		root.setRight(lblRight);
 
-		
-				
-		root.setCenter(gameBoard);
-				
-		//add functionality to the reset button
-		
-		resetGame.setOnAction((event)->{
-		//	if(gameBoard.getID.equals("BBROWN"));
-				
-		//while(gameBoard.getId() != null) {}
-			oldLocationCol = gameBoard.getColumnIndex(wBrown);
-			oldLocationRow = gameBoard.getRowIndex(wBrown);
-			gameBoard.setColumnIndex(bOrange, 5);
-			gameBoard.setRowIndex(bOrange, 2);
-			
-					
-			
-			
-		});
-		
-		btnClick.setOnAction((event)->{
-				//h.setStroke(Color.AQUA);
-				//h.setStrokeWidth(HIGHLIGHT_WIDTH);
-				int [][] gridNum = new int[2][2];
-				int row = gameBoard.getColumnIndex(wBrown);
-				int col = gameBoard.getRowIndex(wBrown);
-				gridNum[row][col] = rectCoordinates;
-				System.out.println("row is: " + row + "col is:" + col);
-		
-		});
-		
-		
 		
 		
 		Scene scene = new Scene(root, 800, 800);
@@ -644,10 +609,8 @@ public class KamisadoClientView {
 		stage.getIcons().add(new Image("/shortyNBaldy.png"));
 		
 	}
-		/* When received information from the server, update the tower positions on the screen
-		 *  
-		 */
-		
+		// When received information from the server, update the tower positions on the screen
+				
 		public void moveTower(String movedTower, int newXPos, int newYPos) {
 			Circle tower = null;
 			ObservableList<Node> allTowers = gameBoard.getChildren();
@@ -659,7 +622,7 @@ public class KamisadoClientView {
 		}
 	}
 		/* highlights fields on the gameboard with the possible moves and makes them clickable
-		 *  from https://stackoverflow.com/questions/20825935/javafx-get-node-by-row-and-column
+		 *  got idea from https://stackoverflow.com/questions/20825935/javafx-get-node-by-row-and-column
 		 */
 
 		public void highlightField(String towerToMove, int xPos, int yPos) {
@@ -675,16 +638,27 @@ public class KamisadoClientView {
 
 		    rec.setStroke(Color.AQUA);
 		    rec.setStrokeWidth(HIGHLIGHT_WIDTH);
-		    rec.setOnMouseClicked((event)->{
-		    	//makes the rectangle clickable, and sends the new position of the tower to the server
+	    	//makes the rectangle clickable, and sends the new position of the tower to the server
+		    rec.setOnMouseClicked((event)-> {
+		    	xPos = gameBoard.getColumnIndex(rec);
+		    	yPos = gameBoard.getRowIndex(rec);
 		    	
-		    	
-		      xPos = gameBoard.getColumnIndex(rec);
-		      yPos = gameBoard.getRowIndex(rec);
-		    	
+		     /*the turning of the coordinates is already inside the sendMove method in the model,
+		      * I think I don't need to add this again in here. just commented it out
+		      * you can delete it, if you don't need it
+		      * 
+		      *  if(model.black) {
+		      *  xPos = model.turnUpsideDown(xPos);
+		      } 
+		      else {
+		    	  yPos = model.turnUpsideDown(yPos);
+		      }
+		      */
+		    	  
 		    	model.sendMove(towerToMove, xPos, yPos);
-		    
 		    	
+		    	
+		    
 		    });
 		}
 		
@@ -693,9 +667,10 @@ public class KamisadoClientView {
 			ObservableList<Node> rectangles = gameBoard.getChildren();
 			
 		    for (Node node : rectangles) {
-		      if (rectangles.listIterator().hasNext() == true) {
+		      if (node instanceof Rectangle) {
 		    	  rec = (Rectangle) node;
 		    	  rec.setStroke(null);
+		    	  rec.setDisable(true);
 		    	  break;
 		      }
 		            
