@@ -644,59 +644,64 @@ public class KamisadoClientView {
 		stage.getIcons().add(new Image("/shortyNBaldy.png"));
 		
 	}
-		/*check if the ID of the tower equals to the name received, find it in the gridPane
-		 * remove it from the old position and place it to the new position
-		 * according to the coordinates received from the server
-		 * 
-		 * 
-		 * here I have a problem that I don't know how to tell remove the Circle Object
-		 * and place it to the new position. movedTower is String; I think I should use 
-		 * method instanceOf Circle or smth similar, but I don't know how to
-		 * 
-		 * Start with looping through the children of gameBoard like I did in highlightFields
-		 * While looping check on each node if(node.getID().equals(movedTower)
-		 * if one passes the "if", you've found your tower (circle)
-		 * then you only need to cast it to a circle: Circle circle = (Circle) node
-		 * and add it at the new position gameBoard.add(circle, newXPos, newYPos);
-		 * 
+		/* When received information from the server, update the tower positions on the screen
+		 *  
 		 */
 		
 		public void moveTower(String movedTower, int newXPos, int newYPos) {
-			//gameBoard.getId().equalsTo().
-			//if (gameBoard.getID != null) {
-			if (movedTower.equals(gameBoard.getId())){
-				gameBoard.getChildren().remove(movedTower);				
-				gameBoard.setRowIndex(movedTower, newXPos);
-				gameBoard.setColumnIndex(movedTower, newYPos);
-				
+			Circle tower = null;
+			ObservableList<Node> allTowers = gameBoard.getChildren();
+			for (Node node : allTowers) {
+				if (node.getId().equals(movedTower)){
+					tower = (Circle) node;
+					gameBoard.add(tower, newYPos, newXPos);
 			}
-			}
-		/* Here I have a same problem. I was thinking to add all Rectangels to the array
-		 * When I receive the xPos yPos of the possible moves, it should find the rectangles
-		 * in these positions and set the strokes other color, so it looks highlighted.
-		 * 
-		 * Simon:
-		 * Here you go. This solution is from https://stackoverflow.com/questions/20825935/javafx-get-node-by-row-and-column
+		}
+	}
+		/* highlights fields on the gameboard with the possible moves and makes them clickable
+		 *  from https://stackoverflow.com/questions/20825935/javafx-get-node-by-row-and-column
 		 */
 
-		//int[][] rectanglesInGrid = new int[8][8];
-		//public void highlightField(int[][] rectanglesInGrid, int xPos, int yPos) {
-		public void highlightField(int xPos, int yPos) {
-			Rectangle h = null;
-		    ObservableList<Node> childrens = gameBoard.getChildren();
+		public void highlightField(String towerToMove, int xPos, int yPos) {
+			Rectangle rec = null;
+			ObservableList<Node> rectangles = gameBoard.getChildren();
 
-		    for (Node node : childrens) {
+		    for (Node node : rectangles) {
 		        if(gameBoard.getRowIndex(node) == yPos && gameBoard.getColumnIndex(node) == xPos) {
-		        	h = (Rectangle) node;
+		        	rec = (Rectangle) node;
 		            break;
 		        }
 		    }
 
-		    h.setStroke(Color.AQUA);
-		    h.setStrokeWidth(HIGHLIGHT_WIDTH);
+		    rec.setStroke(Color.AQUA);
+		    rec.setStrokeWidth(HIGHLIGHT_WIDTH);
+		    rec.setOnMouseClicked((event)->{
+		    	//makes the rectangle clickable, and sends the new position of the tower to the server
+		    	
+		    	
+		      xPos = gameBoard.getColumnIndex(rec);
+		      yPos = gameBoard.getRowIndex(rec);
+		    	
+		    	model.sendMove(towerToMove, xPos, yPos);
+		    
+		    	
+		    });
 		}
-
-
+		
+		public void unHighlightField(int xPos, int yPos) {
+			Rectangle rec = null;
+			ObservableList<Node> rectangles = gameBoard.getChildren();
+			
+		    for (Node node : rectangles) {
+		      if (rectangles.listIterator().hasNext() == true) {
+		    	  rec = (Rectangle) node;
+		    	  rec.setStroke(null);
+		    	  break;
+		      }
+		            
+		        }
+		    }
+		
 	
 	public void firstMove(){
 		//implement the first move here
