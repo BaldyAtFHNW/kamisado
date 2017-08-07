@@ -21,21 +21,14 @@ public class KamisadoClientController {
 		this.model = model;
 		this.view = view;
 		
-		// Example how to register for View events
-		view.btnClick.setOnAction((event) -> {
-			//Do Stuff
-		});
-		
 		view.getStage().setOnCloseRequest((event)->{
 			view.stop();
 			Platform.exit();
 		});		
 		
 		model.newestMsg.addListener( (o, oldValue, newValue) -> processMsg(newValue));
-		logger.info(model.ipAddress);
 		model.connectServer();
 		sendNameToServer();
-
 	}
 	
 	public void sendNameToServer() {
