@@ -3,8 +3,10 @@ package kamisado_client;
 import java.util.logging.Logger;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -650,6 +652,13 @@ public class KamisadoClientView {
 		 * here I have a problem that I don't know how to tell remove the Circle Object
 		 * and place it to the new position. movedTower is String; I think I should use 
 		 * method instanceOf Circle or smth similar, but I don't know how to
+		 * 
+		 * Start with looping through the children of gameBoard like I did in highlightFields
+		 * While looping check on each node if(node.getID().equals(movedTower)
+		 * if one passes the "if", you've found your tower (circle)
+		 * then you only need to cast it to a circle: Circle circle = (Circle) node
+		 * and add it at the new position gameBoard.add(circle, newXPos, newYPos);
+		 * 
 		 */
 		
 		public void moveTower(String movedTower, int newXPos, int newYPos) {
@@ -660,22 +669,31 @@ public class KamisadoClientView {
 				gameBoard.setRowIndex(movedTower, newXPos);
 				gameBoard.setColumnIndex(movedTower, newYPos);
 				
-				
 			}
 			}
 		/* Here I have a same problem. I was thinking to add all Rectangels to the array
 		 * When I receive the xPos yPos of the possible moves, it should find the rectangles
 		 * in these positions and set the strokes other color, so it looks highlighted.
 		 * 
+		 * Simon:
+		 * Here you go. This solution is from https://stackoverflow.com/questions/20825935/javafx-get-node-by-row-and-column
 		 */
 
-		int[][] rectanglesInGrid = new int[8][8];
-		public void highlightField(int[][] rectanglesInGrid, int xPos, int yPos) {
-		
-		//		h.setStroke(Color.AQUA);
-		//		h.setStrokeWidth(HIGHLIGHT_WIDTH);
-			
-		
+		//int[][] rectanglesInGrid = new int[8][8];
+		//public void highlightField(int[][] rectanglesInGrid, int xPos, int yPos) {
+		public void highlightField(int xPos, int yPos) {
+			Rectangle h = null;
+		    ObservableList<Node> childrens = gameBoard.getChildren();
+
+		    for (Node node : childrens) {
+		        if(gameBoard.getRowIndex(node) == yPos && gameBoard.getColumnIndex(node) == xPos) {
+		        	h = (Rectangle) node;
+		            break;
+		        }
+		    }
+
+		    h.setStroke(Color.AQUA);
+		    h.setStrokeWidth(HIGHLIGHT_WIDTH);
 		}
 
 
