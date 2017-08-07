@@ -1,5 +1,6 @@
 package kamisado_client;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -24,14 +26,14 @@ public class KamisadoConnectGUI {
 		ImageView imgView = new ImageView(img);
         imgView.setFitHeight(200);
         imgView.setFitWidth(600);
+        
+		connect = new Button("Connect");
 		
 		Label lblName = new Label("Your Name: ");
 		Label lblIP = new Label("Server's IP: ");
 		
 		txtName = new TextField();
 		txtIP = new TextField();
-		
-		connect = new Button("Connect");
 		
 		grid.add(lblName, 0, 0);
 		grid.add(lblIP, 0, 1);
