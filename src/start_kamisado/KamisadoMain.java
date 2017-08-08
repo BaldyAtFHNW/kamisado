@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.ButtonType;
@@ -24,6 +25,7 @@ import javafx.stage.Stage;
 import kamisado_client.KamisadoClientController;
 import kamisado_client.KamisadoClientModel;
 import kamisado_client.KamisadoClientView;
+import kamisado_client.KamisadoConnectGUI;
 import kamisado_server.KamisadoServerController;
 import kamisado_server.KamisadoServerModel;
 import kamisado_server.KamisadoServerView;
@@ -33,6 +35,7 @@ public class KamisadoMain extends Application{
 	private KamisadoServerView srvView;
 	private KamisadoServerController srvController;
 	
+	private KamisadoConnectGUI connectGUI;
 	private KamisadoClientModel clientModel;
 	private KamisadoClientView clientView;
 	private KamisadoClientController clientController;
@@ -64,10 +67,30 @@ public class KamisadoMain extends Application{
 			srvController = new KamisadoServerController(srvModel, srvView);
 			srvView.start();
 		} else if (result.get() == startClient) {
-			getIPNNameNStartClient(primaryStage);
+			connectGUI = new KamisadoConnectGUI(primaryStage);
+			connectGUI.connect.setOnAction((event) -> {startKamisadoClient(primaryStage);});
+			connectGUI.txtName.setOnKeyPressed((event)->{
+				if (event.getCode() == KeyCode.ENTER)  {
+					startKamisadoClient(primaryStage);
+		        }
+			});
+			connectGUI.txtIP.setOnKeyPressed((event)->{
+				if (event.getCode() == KeyCode.ENTER)  {
+					startKamisadoClient(primaryStage);
+		        }
+			});
+
 		}else {
 			Platform.exit();
 		}
+	}
+	
+	public void startKamisadoClient(Stage clientStage) {
+		//Stage clientStage = new Stage();
+		clientModel = new KamisadoClientModel(connectGUI.txtIP.getText(), connectGUI.txtName.getText());
+		clientView = new KamisadoClientView(clientStage, clientModel);
+		clientController = new KamisadoClientController(clientModel, clientView);
+		clientView.start();
 	}
 	
 	@Override
@@ -78,56 +101,6 @@ public class KamisadoMain extends Application{
 		if(clientView != null) {
 			clientView.stop();
 		}
-	}
-	
-	private void getIPNNameNStartClient(Stage stage) {
-		BorderPane root = new BorderPane();
-		GridPane grid = new GridPane();
-		
-		Image img = new Image(getClass().getResourceAsStream("/shortyNBaldy.png"));
-		ImageView imgView = new ImageView(img);
-        imgView.setFitHeight(200);
-        imgView.setFitWidth(600);
-		
-		Label lblName = new Label("Your Name: ");
-		Label lblIP = new Label("Server's IP: ");
-		
-		TextField txtName = new TextField();
-		TextField txtIP = new TextField();
-		
-		Button connect = new Button("Connect");
-		
-		grid.add(lblName, 0, 0);
-		grid.add(lblIP, 0, 1);
-		grid.add(txtName, 1, 0);
-		grid.add(txtIP, 1, 1);
-		grid.add(connect, 2, 1);
-		
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(20,10,10,150));
-		
-		root.setCenter(grid);
-		root.setBottom(imgView);
-		
-		Scene scene = new Scene(root);
-		
-		stage.setScene(scene);
-		stage.setTitle("Kamisado by ShortyNBaldy - Client");
-		stage.getIcons().add(new Image("/shortyNBaldy.png"));
-		stage.setWidth(605);
-		stage.setResizable(false);
-		stage.show();
-		
-		connect.setOnAction((event) -> {
-			stage.close();
-			Stage clientStage = new Stage();
-			
-			clientModel = new KamisadoClientModel(txtIP.getText(), txtName.getText());
-			clientView = new KamisadoClientView(clientStage, clientModel);
-			clientController = new KamisadoClientController(clientModel, clientView);
-			clientView.start();
-		});
 	}
 	
 }

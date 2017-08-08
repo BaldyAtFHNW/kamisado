@@ -36,10 +36,8 @@ public class KamisadoClientController {
 		});		
 		
 		model.newestMsg.addListener( (o, oldValue, newValue) -> processMsg(newValue));
-		logger.info(model.ipAddress);
 		model.connectServer();
 		sendNameToServer();
-
 	}
 	
 	public void sendNameToServer() {
