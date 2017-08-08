@@ -21,6 +21,15 @@ public class KamisadoClientController {
 		this.model = model;
 		this.view = view;
 		
+		// Example how to register for View events
+		view.btnClick.setOnAction((event) -> {
+			//Do Stuff
+		});
+		
+		view.giveUp.setOnAction((event)->{
+			model.surrender();
+		
+	});
 		view.getStage().setOnCloseRequest((event)->{
 			view.stop();
 			Platform.exit();

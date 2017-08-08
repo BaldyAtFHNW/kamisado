@@ -3,8 +3,10 @@ package kamisado_client;
 import java.util.logging.Logger;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -12,6 +14,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -31,15 +35,10 @@ public class KamisadoClientView {
 	protected Label moveWait;
 	protected BorderPane root;
 	protected GridPane gameBoard;
-	protected int oldLocationCol;
-	protected int newLocationCol;
-	protected int oldLocationRow;
-	protected int newLocationRow;
-	protected Circle wBrown;
-	
+		
 	public static final int FIELD_SIZE = 70;
 	public static final int WIDTH = 10;
-	public static final int HEIGHT = 8;
+	public static final double HIGHLIGHT_WIDTH = 1.5;
 	public static final double SCALEDOWN = 0.42;
 
 	
@@ -50,23 +49,23 @@ public class KamisadoClientView {
 		
 	
 		//View Stuff goes here
-		btnClick = new Button(); //Only an example for showing in the controller how to register for events
+		btnClick = new Button(" Testing "); //Only an example for showing in the controller how to register for events
 		
+		// arrange the client window
 		root = new BorderPane();
 		gameBoard = new GridPane(); // Kamisado game board
-	//	gameBoard.setGridLinesVisible(true);
-		//gameBoard.getColumnConstraints().addAll( new ColumnConstraints( FIELD_SIZE ), new ColumnConstraints( FIELD_SIZE ), new ColumnConstraints( FIELD_SIZE ) );
-	
+		root.setCenter(gameBoard); 
 		HBox upperScreen = new HBox(); // upper part of the game screen for buttons
+		
 		root.setTop(upperScreen); 
 		resetGame = new Button("ResetGame");
 		giveUp = new Button("Give Up");
 		language = new ComboBox<String>(); // drop-down menu to change language in the game
 		language.getItems().addAll("DE", "EN");
 		moveWait = new Label("Move / Wait");
-		upperScreen.getChildren().addAll(resetGame, giveUp, moveWait, language);
+		upperScreen.getChildren().addAll(resetGame, giveUp, moveWait, language, btnClick);
 		
-				
+	// create fields for the gameboard and then set them to the specific position in the grid, all hardcoded			
 	// first row
 		Rectangle a = new Rectangle();
 		a.setWidth(FIELD_SIZE);
@@ -472,108 +471,127 @@ public class KamisadoClientView {
 				ppp.setFill(Color.GOLD);
 				gameBoard.add(ppp, 0, 4);
 				
-// black towers		
+// create black towers and set them to the initial position
 				
 
 		Circle bOrange = new Circle(FIELD_SIZE * SCALEDOWN);
 		bOrange.setFill(Color.ORANGE);
 		bOrange.setStroke(Color.BLACK);
 		bOrange.setStrokeWidth(WIDTH);
+		bOrange.setId("BORANGE");
 		gameBoard.add(bOrange, 0, 0);
 		
 		Circle bBlue = new Circle(FIELD_SIZE * SCALEDOWN);
 		bBlue.setFill(Color.BLUE);
 		bBlue.setStroke(Color.BLACK);
 		bBlue.setStrokeWidth(WIDTH);
+		bBlue.setId("BBLUE");
 		gameBoard.add(bBlue, 1, 0);
 		
 		Circle bPurple = new Circle(FIELD_SIZE * SCALEDOWN);
 		bPurple.setFill(Color.PURPLE);
 		bPurple.setStroke(Color.BLACK);
 		bPurple.setStrokeWidth(WIDTH);
+		bPurple.setId("BPURPLE");
 		gameBoard.add(bPurple, 2, 0);
 		
 		Circle bPink = new Circle(FIELD_SIZE * SCALEDOWN);
 		bPink.setFill(Color.PINK);
 		bPink.setStroke(Color.BLACK);
 		bPink.setStrokeWidth(WIDTH);
+		bPink.setId("BPINK");
 		gameBoard.add(bPink, 3, 0);
 		
 		Circle bYellow = new Circle(FIELD_SIZE * SCALEDOWN);
 		bYellow.setFill(Color.GOLD);
 		bYellow.setStroke(Color.BLACK);
 		bYellow.setStrokeWidth(WIDTH);
+		bYellow.setId("BYELLOW");
 		gameBoard.add(bYellow, 4, 0);
 				
 		Circle bRed = new Circle(FIELD_SIZE * SCALEDOWN);
 		bRed.setFill(Color.RED);
 		bRed.setStroke(Color.BLACK);
 		bRed.setStrokeWidth(WIDTH);
+		bRed.setId("BRED");
 		gameBoard.add(bRed,5, 0);
 		
 		Circle bGreen = new Circle(FIELD_SIZE * SCALEDOWN);
 		bGreen.setFill(Color.GREEN);
 		bGreen.setStroke(Color.BLACK);
 		bGreen.setStrokeWidth(WIDTH);
+		bGreen.setId("BGREEN");
 		gameBoard.add(bGreen, 6, 0);
 		
 		Circle bBrown = new Circle(FIELD_SIZE * SCALEDOWN);
 		bBrown.setFill(Color.BROWN);
 		bBrown.setStroke(Color.BLACK);
 		bBrown.setStrokeWidth(WIDTH);
+		bBrown.setId("BBROWN");
 		gameBoard.add(bBrown, 7, 0);
 		
-	//white towers
+	//create white towers and set them to the initial position
 		Circle wOrange = new Circle(FIELD_SIZE * SCALEDOWN);
 		wOrange.setFill(Color.ORANGE);
 		wOrange.setStroke(Color.WHITE);
 		wOrange.setStrokeWidth(WIDTH);
+		wOrange.setId("WORANGE");
 		gameBoard.add(wOrange, 7, 7);
 		
 		Circle wBlue = new Circle(FIELD_SIZE * SCALEDOWN);
 		wBlue.setFill(Color.BLUE);
 		wBlue.setStroke(Color.WHITE);
 		wBlue.setStrokeWidth(WIDTH);
+		wBlue.setId("WBLUE");
 		gameBoard.add(wBlue, 6, 7);
 		
 		Circle wPurple = new Circle(FIELD_SIZE * SCALEDOWN);
 		wPurple.setFill(Color.PURPLE);
 		wPurple.setStroke(Color.WHITE);
 		wPurple.setStrokeWidth(WIDTH);
+		wPurple.setId("WBLUE");
 		gameBoard.add(wPurple, 5, 7);
 		
 		Circle wPink = new Circle(FIELD_SIZE * SCALEDOWN);
 		wPink.setFill(Color.PINK);
 		wPink.setStroke(Color.WHITE);
 		wPink.setStrokeWidth(WIDTH);
+		wPink.setId("WPINK");
 		gameBoard.add(wPink, 4, 7);
 		
 		Circle wYellow= new Circle(FIELD_SIZE * SCALEDOWN);
 		wYellow.setFill(Color.GOLD);
 		wYellow.setStroke(Color.WHITE);
 		wYellow.setStrokeWidth(WIDTH);
+		wYellow.setId("WYELLOW");
 		gameBoard.add(wYellow, 3, 7);
 				
 		Circle wRed = new Circle(FIELD_SIZE * SCALEDOWN);
 		wRed.setFill(Color.RED);
 		wRed.setStroke(Color.WHITE);
 		wRed.setStrokeWidth(WIDTH);
+		wRed.setId("WRED");
 		gameBoard.add(wRed,  2, 7);
 		
 		Circle wGreen = new Circle(FIELD_SIZE * SCALEDOWN);
 		wGreen.setFill(Color.GREEN);
 		wGreen.setStroke(Color.WHITE);
 		wGreen.setStrokeWidth(WIDTH);
+		wGreen.setId("WGREEN");
 		gameBoard.add(wGreen, 1, 7);
 		
-		wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
 		wBrown.setFill(Color.BROWN);
 		wBrown.setStroke(Color.WHITE);
 		wBrown.setStrokeWidth(WIDTH);
+		wBrown.setId("WBROWN");
 		gameBoard.add(wBrown, 0, 7);
 				
-		root.setCenter(gameBoard);
 		
+
+
+		
+		//set the labels to the free parts of borderpane, maye we can add there smth later
 		Label lblBottom = new Label("Bottom");
 		root.setBottom(lblBottom);
 		Label lblLeft = new Label("Left");
@@ -582,23 +600,8 @@ public class KamisadoClientView {
 		root.setRight(lblRight);
 
 		
-				
-		root.setCenter(gameBoard);
-				
-		//add functionality to the reset button
 		
-		resetGame.setOnAction((event)->{
-			oldLocationCol = gameBoard.getColumnIndex(wBrown);
-			oldLocationRow = gameBoard.getRowIndex(wBrown);
-			gameBoard.setColumnIndex(wBrown, 5);
-			gameBoard.setRowIndex(wBrown, 2);
-			
-		});
-		
-	
-		
-		
-		Scene scene = new Scene(root);
+		Scene scene = new Scene(root, 800, 800);
 		scene.getStylesheets().add(
                 getClass().getResource("layouts.css").toExternalForm());
 		stage.setScene(scene);
@@ -606,7 +609,74 @@ public class KamisadoClientView {
 		stage.getIcons().add(new Image("/shortyNBaldy.png"));
 		
 	}
+		// When received information from the server, update the tower positions on the screen
+				
+		public void moveTower(String movedTower, int newXPos, int newYPos) {
+			Circle tower = null;
+			ObservableList<Node> allTowers = gameBoard.getChildren();
+			for (Node node : allTowers) {
+				if (node.getId().equals(movedTower)){
+					tower = (Circle) node;
+					gameBoard.add(tower, newYPos, newXPos);
+			}
+		}
+	}
+		/* highlights fields on the gameboard with the possible moves and makes them clickable
+		 *  got idea from https://stackoverflow.com/questions/20825935/javafx-get-node-by-row-and-column
+		 */
 
+		public void highlightField(String towerToMove, int xPos, int yPos) {
+			Rectangle rec = null;
+			ObservableList<Node> rectangles = gameBoard.getChildren();
+
+		    for (Node node : rectangles) {
+		        if(gameBoard.getRowIndex(node) == yPos && gameBoard.getColumnIndex(node) == xPos) {
+		        	rec = (Rectangle) node;
+		            break;
+		        }
+		    }
+
+		    rec.setStroke(Color.AQUA);
+		    rec.setStrokeWidth(HIGHLIGHT_WIDTH);
+	    	//makes the rectangle clickable, and sends the new position of the tower to the server
+		    rec.setOnMouseClicked((event)-> {
+		    	xPos = gameBoard.getColumnIndex(rec);
+		    	yPos = gameBoard.getRowIndex(rec);
+		    	
+		     /*the turning of the coordinates is already inside the sendMove method in the model,
+		      * I think I don't need to add this again in here. just commented it out
+		      * you can delete it, if you don't need it
+		      * 
+		      *  if(model.black) {
+		      *  xPos = model.turnUpsideDown(xPos);
+		      } 
+		      else {
+		    	  yPos = model.turnUpsideDown(yPos);
+		      }
+		      */
+		    	  
+		    	model.sendMove(towerToMove, xPos, yPos);
+		    	
+		    	
+		    
+		    });
+		}
+		
+		public void unHighlightField(int xPos, int yPos) {
+			Rectangle rec = null;
+			ObservableList<Node> rectangles = gameBoard.getChildren();
+			
+		    for (Node node : rectangles) {
+		      if (node instanceof Rectangle) {
+		    	  rec = (Rectangle) node;
+		    	  rec.setStroke(null);
+		    	  rec.setDisable(true);
+		    	  break;
+		      }
+		            
+		        }
+		    }
+		
 	
 	public void firstMove(){
 		//implement the first move here
@@ -630,7 +700,12 @@ public class KamisadoClientView {
 	public Stage getStage(){
 		return stage;
 	}
-
+		
+	Image congrats = new Image(getClass().getResourceAsStream("congrats.gif"));
+	ImageView imageViewWinner = new ImageView(congrats);
+	
+	Image youLost = new Image(getClass().getResourceAsStream("ha ha_0.5.jpg"));
+	ImageView imageViewLoser = new ImageView(youLost);
 
 	public void showEnd(boolean won, String reason) {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -638,8 +713,11 @@ public class KamisadoClientView {
 		
 		if(won) {
 			alert.setHeaderText("Congratulations, you won!!!");
+			alert.setGraphic(imageViewWinner);
+			
 		}else {
 			alert.setHeaderText("Sorry, you lost :(");
+			alert.setGraphic(imageViewLoser);
 		}
 		
 		if(reason.equals("surrender")) {
@@ -650,5 +728,5 @@ public class KamisadoClientView {
 		alert.showAndWait();
 		this.stop();
 	}
-
-}
+	}
+	
