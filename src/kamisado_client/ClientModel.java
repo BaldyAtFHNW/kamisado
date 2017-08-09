@@ -14,19 +14,23 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 import javafx.beans.property.SimpleStringProperty;
 
-public class KamisadoClientModel {
+public class ClientModel {
 	final public String ipAddress;
 	final private int port = 50000;
 	private Logger logger = Logger.getLogger("");
 	private Socket serverSocket;
 	
 	protected SimpleStringProperty newestMsg = new SimpleStringProperty();
+	protected SimpleStringProperty latestMove = new SimpleStringProperty();
 
 	final public String playerName;
 	public boolean black;
+	public boolean start;
 	public String opponent;
 	
-	public KamisadoClientModel(String ip, String playerName) {
+	String br = System.getProperty("line.separator");
+	
+	public ClientModel(String ip, String playerName) {
 		this.ipAddress = ip;
 		this.playerName = playerName;
 	}
@@ -45,7 +49,7 @@ public class KamisadoClientModel {
 			Platform.exit();
 		}
 		
-		KamisadoClientServerThread server = new KamisadoClientServerThread(KamisadoClientModel.this, serverSocket);
+		ClientServerThread server = new ClientServerThread(ClientModel.this, serverSocket);
 		new Thread(server).start();	
 	}
 
@@ -53,7 +57,7 @@ public class KamisadoClientModel {
 		OutputStreamWriter out;
 		try{
 			out = new OutputStreamWriter(this.serverSocket.getOutputStream());
-			out.write(msg + "\n");
+			out.write(msg + br);
 			out.flush();
 		}catch(Exception e){
 			logger.warning(e.toString());
@@ -74,6 +78,15 @@ public class KamisadoClientModel {
 		json.put("towerColor", towerColor);
 		json.put("xPos", xPos);
 		json.put("yPos", yPos);
+		
+		this.send(json.toString());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void sendChatMsg(String msg) {
+		JSONObject json = new JSONObject();
+		json.put("type", "chat");
+		json.put("msg", msg);
 		
 		this.send(json.toString());
 	}

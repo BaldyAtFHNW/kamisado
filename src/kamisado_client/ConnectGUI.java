@@ -13,12 +13,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-public class KamisadoConnectGUI {
+public class ConnectGUI {
 	public Button connect;
 	public TextField txtName;
 	public TextField txtIP;
 	
-	public KamisadoConnectGUI(Stage stage) {
+	public ConnectGUI(Stage stage) {
 		BorderPane root = new BorderPane();
 		GridPane grid = new GridPane();
 		
@@ -32,8 +32,8 @@ public class KamisadoConnectGUI {
 		Label lblName = new Label("Your Name: ");
 		Label lblIP = new Label("Server's IP: ");
 		
-		txtName = new TextField();
-		txtIP = new TextField();
+		txtName = new TextField("Your Name");
+		txtIP = new TextField("127.0.0.1");
 		
 		grid.add(lblName, 0, 0);
 		grid.add(lblIP, 0, 1);

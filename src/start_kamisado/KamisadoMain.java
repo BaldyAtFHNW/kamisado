@@ -1,44 +1,33 @@
 package start_kamisado;
 
 import java.util.Optional;
-
-import com.sun.media.jfxmedia.logging.Logger;
-
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
-import kamisado_client.KamisadoClientController;
-import kamisado_client.KamisadoClientModel;
-import kamisado_client.KamisadoClientView;
-import kamisado_client.KamisadoConnectGUI;
-import kamisado_server.KamisadoServerController;
-import kamisado_server.KamisadoServerModel;
-import kamisado_server.KamisadoServerView;
+import kamisado_client.ClientController;
+import kamisado_client.ClientModel;
+import kamisado_client.ClientView;
+import kamisado_client.ConnectGUI;
+import kamisado_server.ServerController;
+import kamisado_server.ServerModel;
+import kamisado_server.ServerView;
 
 public class KamisadoMain extends Application{
-	private KamisadoServerModel srvModel;
-	private KamisadoServerView srvView;
-	private KamisadoServerController srvController;
+	private ServerModel srvModel;
+	private ServerView srvView;
+	private ServerController srvController;
 	
-	private KamisadoConnectGUI connectGUI;
-	private KamisadoClientModel clientModel;
-	private KamisadoClientView clientView;
-	private KamisadoClientController clientController;
+	private ClientModel clientModel;
+	private ClientView clientView;
+	private ClientController clientController;
+	
+	private ConnectGUI connectGUI;
 
 	//Source: http://code.makery.ch/blog/javafx-dialogs-official/
 	public static void main(String[] args) {
@@ -62,12 +51,12 @@ public class KamisadoMain extends Application{
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == startSrv){
-			srvModel = new KamisadoServerModel();
-			srvView = new KamisadoServerView(primaryStage, srvModel);
-			srvController = new KamisadoServerController(srvModel, srvView);
+			srvModel = new ServerModel();
+			srvView = new ServerView(primaryStage, srvModel);
+			srvController = new ServerController(srvModel, srvView);
 			srvView.start();
 		} else if (result.get() == startClient) {
-			connectGUI = new KamisadoConnectGUI(primaryStage);
+			connectGUI = new ConnectGUI(primaryStage);
 			connectGUI.connect.setOnAction((event) -> {startKamisadoClient(primaryStage);});
 			connectGUI.txtName.setOnKeyPressed((event)->{
 				if (event.getCode() == KeyCode.ENTER)  {
@@ -87,10 +76,11 @@ public class KamisadoMain extends Application{
 	
 	public void startKamisadoClient(Stage clientStage) {
 		//Stage clientStage = new Stage();
-		clientModel = new KamisadoClientModel(connectGUI.txtIP.getText(), connectGUI.txtName.getText());
-		clientView = new KamisadoClientView(clientStage, clientModel);
-		clientController = new KamisadoClientController(clientModel, clientView);
-		clientView.start();
+		clientModel = new ClientModel(connectGUI.txtIP.getText(), connectGUI.txtName.getText());
+		clientView = new ClientView(clientStage, clientModel);
+		//pendingGUI = new PendingForStartGUI(clientStage);
+		clientController = new ClientController(clientModel, clientView);
+		clientView.start();  //fix, otherwise not JavaFX thread
 	}
 	
 	@Override

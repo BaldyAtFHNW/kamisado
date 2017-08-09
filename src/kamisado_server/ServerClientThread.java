@@ -5,14 +5,14 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.logging.Logger;
 
-public class KamisadoServerClientThread implements Runnable{
+public class ServerClientThread implements Runnable{
 	private Logger logger = Logger.getLogger("");
-	KamisadoServerModel model;
+	ServerModel model;
 	Socket clientSocket;
 	boolean black = false;
 	BufferedReader in;
 
-	public KamisadoServerClientThread(KamisadoServerModel model, Socket socket, boolean black){
+	public ServerClientThread(ServerModel model, Socket socket, boolean black){
 		this.model = model;
 		this.clientSocket = socket;
 		this.black = black;
@@ -27,6 +27,7 @@ public class KamisadoServerClientThread implements Runnable{
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			while(true){
 				msg = in.readLine();
+				logger.info("Received: " + msg);
 				if(black == true){
 					model.newestMsgPlBlack.set(msg);
 				}else{
