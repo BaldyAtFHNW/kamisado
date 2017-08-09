@@ -21,25 +21,43 @@ public class KamisadoClientController {
 		this.model = model;
 		this.view = view;
 		
-		// Example how to register for View events
-		view.btnClick.setOnAction((event) -> {
-			//Do Stuff
-		});
+//		view.giveUp.setOnAction((event)->{
+////			//model.surrender();
+//////			int xPos = 1;
+//////			int yPos = 1;
+//////			
+//////			if(model.black) { //this is the black client
+//////				xPos = model.turnUpsideDown(xPos);
+//////			}else {
+//////				yPos = model.turnUpsideDown(yPos);
+//////			}
+//////			
+//////			view.moveTower("WGREEN", xPos, yPos);
+////			
+//////			String towerToMove = "WPINK";
+//////			int xPos = 4;
+//////			int yPos = 3;
+//////				if(model.black) { //this is the black client
+//////					xPos = model.turnUpsideDown(xPos);
+//////				}else {
+//////					yPos = model.turnUpsideDown(yPos);
+//////				}
+//////			
+//////			view.highlightFieldNTower(towerToMove, xPos, yPos);
+////			
+////			view.firstMove();
+//		});
 		
-		view.giveUp.setOnAction((event)->{
-			model.surrender();
-		
-	});
-		view.getStage().setOnCloseRequest((event)->{
-			view.stop();
-			Platform.exit();
-		});		
+//		view.getStage().setOnCloseRequest((event)->{
+//			view.stop();
+//		});		
 		
 		model.newestMsg.addListener( (o, oldValue, newValue) -> processMsg(newValue));
 		model.connectServer();
 		sendNameToServer();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void sendNameToServer() {
 		JSONObject json = new JSONObject();
 		json.put("type", "introduction");
@@ -67,15 +85,20 @@ public class KamisadoClientController {
 	
 	private void processInit(JSONObject json) {
 		model.black = (boolean) json.get("black");
+		model.start = (boolean) json.get("start");
 		model.opponent = (String) json.get("opponent");
-		if((boolean) json.get("start")) {
+
+		view.getStage().setOnShowing((event)->{
 			view.firstMove();
-		}
+		});
+		
+		view.initGame();
 	}
 	
 	private void processRequestMove(JSONObject json){
 		//Display oppononent's move
 		String movedTower = (String) json.get("movedTower");
+		String towerToMove = (String) json.get("nextTower");
 		int newXPos = (int) json.get("xPos");
 		int newYPos = (int) json.get("yPos");
 		if(model.black) { //this is the black client
@@ -83,14 +106,13 @@ public class KamisadoClientController {
 		}else {
 			newYPos = model.turnUpsideDown(newYPos);
 		}
+		view.moveTower(movedTower, newXPos, newYPos);
 		
-		//view.moveTower(movedTower, newXPos, newYPos);									<--------- does not exist yet
 		
 		//Highlight possible moves ----- (Highlight fields and make them clickable)
 		JSONArray jsonArray = (JSONArray) json.get("possibleMoves");
 		@SuppressWarnings("unchecked")
 		Iterator<JSONObject> iterator = jsonArray.iterator();
-		
 		while(iterator.hasNext()) {
 			JSONObject possibleMove = iterator.next();
 			int xPos = (int) possibleMove.get("xPos");
@@ -100,7 +122,7 @@ public class KamisadoClientController {
 			}else {
 				yPos = model.turnUpsideDown(yPos);
 			}
-			//view.highlightField(xPos, yPos);											<--------- does not exist yet
+			view.activateField(towerToMove, xPos, yPos);
 		}
 	}
 	
@@ -108,7 +130,7 @@ public class KamisadoClientController {
 		boolean won = (boolean) json.get("won");
 		String reason = (String) json.get("reason");
 		
-		view.showEnd(won, reason);
+		//view.showEnd(won, reason);
 	}
 	
 }

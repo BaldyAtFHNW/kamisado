@@ -24,6 +24,7 @@ public class KamisadoClientModel {
 
 	final public String playerName;
 	public boolean black;
+	public boolean start;
 	public String opponent;
 	
 	public KamisadoClientModel(String ip, String playerName) {

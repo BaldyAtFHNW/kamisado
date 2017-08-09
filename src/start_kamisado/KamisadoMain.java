@@ -26,6 +26,7 @@ import kamisado_client.KamisadoClientController;
 import kamisado_client.KamisadoClientModel;
 import kamisado_client.KamisadoClientView;
 import kamisado_client.KamisadoConnectGUI;
+import kamisado_client.PendingForStartGUI;
 import kamisado_server.KamisadoServerController;
 import kamisado_server.KamisadoServerModel;
 import kamisado_server.KamisadoServerView;
@@ -35,10 +36,12 @@ public class KamisadoMain extends Application{
 	private KamisadoServerView srvView;
 	private KamisadoServerController srvController;
 	
-	private KamisadoConnectGUI connectGUI;
 	private KamisadoClientModel clientModel;
 	private KamisadoClientView clientView;
 	private KamisadoClientController clientController;
+	
+	private KamisadoConnectGUI connectGUI;
+	private PendingForStartGUI pendingGUI;
 
 	//Source: http://code.makery.ch/blog/javafx-dialogs-official/
 	public static void main(String[] args) {
@@ -89,8 +92,9 @@ public class KamisadoMain extends Application{
 		//Stage clientStage = new Stage();
 		clientModel = new KamisadoClientModel(connectGUI.txtIP.getText(), connectGUI.txtName.getText());
 		clientView = new KamisadoClientView(clientStage, clientModel);
+		//pendingGUI = new PendingForStartGUI(clientStage);
 		clientController = new KamisadoClientController(clientModel, clientView);
-		clientView.start();
+		clientView.start();  //fix, otherwise not JavaFX thread
 	}
 	
 	@Override

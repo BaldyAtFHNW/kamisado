@@ -32,8 +32,8 @@ public class KamisadoConnectGUI {
 		Label lblName = new Label("Your Name: ");
 		Label lblIP = new Label("Server's IP: ");
 		
-		txtName = new TextField();
-		txtIP = new TextField();
+		txtName = new TextField("Your Name");
+		txtIP = new TextField("127.0.0.1");
 		
 		grid.add(lblName, 0, 0);
 		grid.add(lblIP, 0, 1);
