@@ -13,12 +13,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-public class KamisadoConnectGUI {
+public class ConnectGUI {
 	public Button connect;
 	public TextField txtName;
 	public TextField txtIP;
 	
-	public KamisadoConnectGUI(Stage stage) {
+	public ConnectGUI(Stage stage) {
 		BorderPane root = new BorderPane();
 		GridPane grid = new GridPane();
 		

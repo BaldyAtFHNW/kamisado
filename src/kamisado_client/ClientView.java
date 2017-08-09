@@ -12,6 +12,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Glow;
 import javafx.scene.control.Alert.AlertType;
@@ -28,49 +30,71 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 
-public class KamisadoClientView {
+public class ClientView {
 	private Logger logger = Logger.getLogger("");
 	private Stage stage;
-	private KamisadoClientModel model;
+	private ClientModel model;
 	protected Button giveUp;
 	GridPane gameBoard;
+	
+	
+	public TextArea lastMoves;
+	public TextArea chatArea;
+	public TextField chatTxt;
+	public Button chatBtn;
 
 	final int FIELD_SIZE = 70;
 	final int STROKE_WIDTH = 10;
 	final double HIGHLIGHT_WIDTH = 1.5;
 	final double SCALEDOWN = 0.42;
 
-	public KamisadoClientView(Stage stage, KamisadoClientModel model) {
+	String br = System.getProperty("line.separator");
+	
+	public ClientView(Stage stage, ClientModel model) {
 		this.stage = stage;
 		this.model = model;
-		
-
 	}
 	
 	public void initGame() {
 		Platform.runLater(new Runnable(){
 			@Override
 			public void run() {
-				VBox root = new VBox();
-				HBox topH = new HBox();
-				HBox bottomH = new HBox();
+				HBox root = new HBox();
+				VBox left = new VBox();
 				gameBoard = new GridPane();
+				
+				HBox chat = new HBox();
+				
+				lastMoves = new TextArea();
+				lastMoves.setEditable(false);
+				lastMoves.setMaxSize(434, 100);
+				lastMoves.setMinSize(434, 100);
+				
+				chatArea = new TextArea();
+				chatArea.setEditable(false);
+				chatArea.setMaxSize(434, 434);
+				chatArea.setMinSize(434, 434);
+				
+				chatTxt = new TextField();
+				chatTxt.setMaxWidth(354);
+				chatTxt.setMinWidth(354);
+				
+				chatBtn = new Button("Send");
+				chatBtn.setMaxWidth(80);
+				chatBtn.setMinWidth(80);
 
-				giveUp = new Button("Give Up");
-				Label moveWait = new Label("Move / Wait");
+				//giveUp = new Button("Give Up");
 				
-				ComboBox<String> language = new ComboBox<String>();
-				language.getItems().addAll("DE", "EN");
-				
-				topH.getChildren().addAll(giveUp, moveWait, language);
-				bottomH.getChildren().add(gameBoard);
-				root.getChildren().addAll(topH, bottomH);
+				chat.getChildren().addAll(chatTxt, chatBtn);
+				left.getChildren().addAll(lastMoves, chatArea, chat);
+				root.getChildren().addAll(gameBoard, left);
 				
 				createFields();
-				creatTowers();
+				createTowers();
 
-				Scene scene = new Scene(root, 800, 800);
+				Scene scene = new Scene(root, 1000, 560);
 				stage.setScene(scene);
+				stage.setWidth(1000);
 				stage.setTitle("Kamisado by ShortyNBaldy - Client");
 				stage.getIcons().add(new Image("/shortyNBaldy.png"));
 			}
@@ -79,32 +103,38 @@ public class KamisadoClientView {
 	}
 
 	public void moveTower(String towerToMove, int col, int row) {
-		Circle tower = getTower(towerToMove);
 			Platform.runLater(new Runnable(){
 				@Override
 				public void run() {
+					Circle tower = new Circle();
+					for (Node node : gameBoard.getChildren()) {
+						if(node instanceof Circle && node.getId().equals(towerToMove)) {
+							tower = (Circle) node;
+						}
+					}
 					gameBoard.getChildren().remove(tower);
 					gameBoard.add(tower, col, row);
+					
+					lastMoves.appendText(tower.getId() + " has been moved to: " + col + " " + row + br);
+					
 				}
 			});
 	}
 
-	public void activateField(String towerToMove, int col, int row) {
-		Rectangle field = getField(col, row);
-		Circle tower = getTower(towerToMove);
-		
+	public void showPossibleMove(String towerToMove, int col, int row) {
 		Platform.runLater(new Runnable(){
 			@Override
-			public void run() {
+			public void run() {				
 				Circle possTower = new Circle(FIELD_SIZE * SCALEDOWN);
 				possTower.setFill(Color.TRANSPARENT);
-				possTower.setStroke(Color.GREY);
+				possTower.setStroke(Color.rgb(200, 200, 200, 0.9));
+				//r2.setFill(Color.rgb(200, 200, 200, 0.5));
 				possTower.setStrokeWidth(STROKE_WIDTH);
 				possTower.setId("imaginary");
 				gameBoard.add(possTower, col, row);
 				
 				possTower.setOnMouseClicked((event) -> {
-					deActivateAllFields();
+					hideAllMoves();
 					moveTower(towerToMove, col, row);
 					model.sendMove(towerToMove, col, row);
 				});
@@ -112,41 +142,18 @@ public class KamisadoClientView {
 		});
 	}
 	
-	public void deActivateAllFields() {
+	public void hideAllMoves() {
 		for (Node node : gameBoard.getChildren()) {
 			if(node instanceof Circle && node.getId().equals("imaginary")) {
 				Platform.runLater(new Runnable(){
 					@Override
 					public void run() {
-						Circle tower = new Circle();
-						tower = (Circle) node;
+						Circle tower = (Circle) node;
 						gameBoard.getChildren().remove(tower);
-					}
-				});
+						}
+					});
 			}
 		}
-	}
-	
-	public Circle getTower(String movedTower) {
-		Circle tower = new Circle();
-		for (Node node : gameBoard.getChildren()) {
-			if(node instanceof Circle && node.getId().equals(movedTower)) {
-				tower = (Circle) node;
-			}
-		}
-		return tower;
-	}
-	
-	public Rectangle getField(int col, int row) {
-		Rectangle field = new Rectangle();
-		for (Node node : gameBoard.getChildren()) {
-			if(node instanceof Rectangle) {
-				if(gameBoard.getColumnIndex(node) == col && gameBoard.getRowIndex(node)== row) {
-					field = (Rectangle) node;
-				}
-			}
-		}
-		return field;
 	}
 
 	public void firstMove() {
@@ -169,7 +176,7 @@ public class KamisadoClientView {
 					activateFirstMoveFields(towerID, col, row);
 				});
 				tower.setOnMouseExited((event)->{
-					deActivateAllFields();
+					hideAllMoves();
 				});
 				tower.setOnMouseClicked((e)->{
 					deActivateTowers(playerCol);
@@ -198,7 +205,7 @@ public class KamisadoClientView {
 		while(col >= 0  && row > 0 && col <= 7 && row <= 7) {
 			col--; row--;
 			if(col >= 0  && row > 0 && col <= 7 && row <= 7) {
-				this.activateField(tower, col, row);
+				this.showPossibleMove(tower, col, row);
 			}
 		}
 		
@@ -208,7 +215,7 @@ public class KamisadoClientView {
 		while(col >= 0  && row > 0 && col <= 7 && row <= 7) {
 			col++; row--;
 			if(col >= 0  && row > 0 && col <= 7 && row <= 7) {
-				this.activateField(tower, col, row);
+				this.showPossibleMove(tower, col, row);
 			}
 		}
 		
@@ -218,10 +225,33 @@ public class KamisadoClientView {
 		while(col >= 0  && row > 0 && col <= 7 && row <= 7) {
 			row--;
 			if(col >= 0  && row > 0 && col <= 7 && row <= 7) {
-				this.activateField(tower, col, row);
+				this.showPossibleMove(tower, col, row);
 			}
 		}
 		
+	}
+	
+	public void showEnd(boolean won, String reason) {
+		Platform.runLater(new Runnable(){
+			@Override
+			public void run() {				
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Kamisado by ShortyNBaldy - Client");
+				if(won) {
+					alert.setHeaderText("You Won!");
+					if(reason.equals("surrender")) {
+						alert.setContentText("Your opponent gave up.");
+					}else {
+						alert.setContentText("Congratulations, you reached your opponent's baseline!");
+					}
+				}else {
+					alert.setHeaderText("Sorry, you lost..");
+					alert.setContentText("Your opponent reached your baseline.");
+				}
+				alert.showAndWait();
+				Platform.exit();
+			}
+		});
 	}
 	
 	public void start() {
@@ -237,7 +267,7 @@ public class KamisadoClientView {
 		return stage;
 	}
 	
-	private void creatTowers() {
+	private void createTowers() {
 		// create black towers and set them to the initial position
 
 		Circle bOrange = new Circle(FIELD_SIZE * SCALEDOWN);
@@ -355,7 +385,7 @@ public class KamisadoClientView {
 		wPurple.setFill(Color.PURPLE);
 		wPurple.setStroke(Color.WHITE);
 		wPurple.setStrokeWidth(STROKE_WIDTH);
-		wPurple.setId("WBLUE");
+		wPurple.setId("WPURPLE");
 		if(model.black) {
 			gameBoard.add(wPurple, 2, 0);
 		}else {
@@ -813,31 +843,4 @@ public class KamisadoClientView {
 		gameBoard.add(ppp, 0, 4);
 	}
 
-//	Image congrats = new Image(getClass().getResourceAsStream("congrats.gif"));
-//	ImageView imageViewWinner = new ImageView(congrats);
-//
-//	Image youLost = new Image(getClass().getResourceAsStream("ha ha_0.5.jpg"));
-//	ImageView imageViewLoser = new ImageView(youLost);
-//
-//	public void showEnd(boolean won, String reason) {
-//		Alert alert = new Alert(AlertType.CONFIRMATION);
-//		alert.setTitle("Game Ended");
-//
-//		if (won) {
-//			alert.setHeaderText("Congratulations, you won!!!");
-//			alert.setGraphic(imageViewWinner);
-//
-//		} else {
-//			alert.setHeaderText("Sorry, you lost :(");
-//			alert.setGraphic(imageViewLoser);
-//		}
-//
-//		if (reason.equals("surrender")) {
-//			alert.setContentText("Your opponent gave up...");
-//		} else {
-//			alert.setContentText("You managed to put a tower to the other baseline :)");
-//		}
-//		alert.showAndWait();
-//		this.stop();
-//	}
 }

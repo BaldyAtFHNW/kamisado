@@ -5,12 +5,14 @@ import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class KamisadoServerController{
+import javafx.application.Platform;
+
+public class ServerController{
 	private Logger logger = Logger.getLogger("");
-	private KamisadoServerModel model;
-	private KamisadoServerView view;
+	private ServerModel model;
+	private ServerView view;
 	
-	public KamisadoServerController(KamisadoServerModel model, KamisadoServerView view){
+	public ServerController(ServerModel model, ServerView view){
 		this.model = model;
 		this.view = view;
 		
@@ -35,6 +37,8 @@ public class KamisadoServerController{
 		switch (type) {
 			case "introduction":	processIntroduction(json, plColor);
 				break;
+			case "chat":			processChatMsg(json, plColor);
+				break;	
 	        case "move":			processMove(json, plColor);
 	        	break;
 	        case "end":				processEnd(json, plColor);// can only be surrendering
@@ -56,27 +60,82 @@ public class KamisadoServerController{
 	}
 	
 	@SuppressWarnings("unchecked")
+	private void processChatMsg(JSONObject json, char plColor){
+		String msg = (String) json.get("msg");
+		msg = plColor == 'B' ? model.namePlB + ": " + msg : model.namePlW + ": " + msg ;
+		
+		JSONObject newJSON = new JSONObject();
+		newJSON.put("type", "chat");
+		newJSON.put("msg", msg);
+		
+		model.send(newJSON.toString(), 'B');
+		model.send(newJSON.toString(), 'W');
+	}
+	
+	@SuppressWarnings("unchecked")
 	private void processMove(JSONObject json, char plColor){
+		char nextPlayer = plColor == 'B' ? 'W' : 'B';
+		boolean wasBlocked;
 		String movedTwrStr = (String) json.get("towerColor");
 		TowerColor movedTwr = TowerColor.valueOf(movedTwrStr);
-		int newXPos = (int) json.get("xPos");
-		int newYPos = (int) json.get("yPos");
+		Long x = (long) json.get("xPos");
+		Long y = (long) json.get("yPos");
+		int newXPos = x.intValue();
+		int newYPos = y.intValue();
+		
+		String playerName = plColor == 'B' ? model.namePlB : model.namePlW;
+		model.newMsgGui.set(playerName + " has moved " + movedTwrStr + " to " + newXPos + " " + newYPos);
 		
 		model.moveTower(movedTwr, newXPos, newYPos);
 		FieldColor landedFieldCol = model.getFieldColor(newXPos, newYPos);
-		TowerColor nextTwr = TowerColor.valueOf(plColor + landedFieldCol.toString());
+		TowerColor nextTwr = TowerColor.valueOf(nextPlayer + landedFieldCol.toString());
 		
 		JSONArray possibleMoves = model.getPossibleMoves(nextTwr);
 		
-		JSONObject newJSON = new JSONObject();
-		newJSON.put("type", "requestMove");
-		newJSON.put("movedTower", movedTwr.toString());
-		newJSON.put("xPos", newXPos);
-		newJSON.put("yPos", newYPos);
-		newJSON.put("nextTower", nextTwr.toString());
-		newJSON.put("possibleMoves", possibleMoves);
-		
-		model.send(newJSON.toString(), plColor);
+		if(possibleMoves.isEmpty()) {	//Player is blocked
+//			//Inform Players
+//			String nameBlockedPl = plColor == 'B' ? model.namePlB : model.namePlW;
+//			JSONObject newJSON = new JSONObject();
+//			newJSON.put("type", "chat");
+//			newJSON.put("msg", nameBlockedPl + " is blocked!");
+//			//model.send(newJSON.toString(), 'B');							<------------ not implemented on client side, yet
+//			//model.send(newJSON.toString(), 'W');							<------------ not implemented on client side, yet
+			
+			//Update move on blocked Players Gameboard
+			JSONObject newJSON = new JSONObject();
+			newJSON.put("type", "requestMove");
+			newJSON.put("movedTower", movedTwrStr);
+			newJSON.put("xPos", newXPos);
+			newJSON.put("yPos", newYPos);
+			newJSON.put("opponentBlocked", false);
+			newJSON.put("playerBlocked", true);
+			model.send(newJSON.toString(), nextPlayer);
+			
+			
+			//Ask same Player for another move
+			newJSON = new JSONObject();
+			newJSON.put("type", "requestMove");
+			Integer[] blockedTwrPos = model.getTowerPos(nextTwr);
+			FieldColor blockedTwrFieldCol = model.getFieldColor(blockedTwrPos[0], blockedTwrPos[1]);
+			nextTwr = TowerColor.valueOf(plColor + blockedTwrFieldCol.toString());
+			newJSON.put("nextTower", nextTwr.toString());
+			newJSON.put("possibleMoves", model.getPossibleMoves(nextTwr));
+			newJSON.put("opponentBlocked", true);
+			newJSON.put("playerBlocked", false);
+			model.send(newJSON.toString(), plColor); //This message goes back to same player
+			
+		}else {							//Nobody blocked
+			JSONObject newJSON = new JSONObject();
+			newJSON.put("type", "requestMove");
+			newJSON.put("movedTower", movedTwrStr);
+			newJSON.put("xPos", newXPos);
+			newJSON.put("yPos", newYPos);
+			newJSON.put("nextTower", nextTwr.toString());
+			newJSON.put("possibleMoves", possibleMoves);
+			newJSON.put("opponentBlocked", false);
+			newJSON.put("playerBlocked", false);
+			model.send(newJSON.toString(), nextPlayer);
+		}
 		
 		//Check if somebody won
 		if(newYPos == 0 || newYPos == 7) {
@@ -116,60 +175,8 @@ public class KamisadoServerController{
 		char looserCol = (winnerCol == 'W') ? 'B' : 'W';
 		model.send(json_winner.toString(), winnerCol);
 		model.send(json_loser.toString(), looserCol);
-	}
-
-	private void testOnlyWithServer() {
-		model.initTowers();
-		model.initGameBoard();		
-
-		int x;
-		int y;
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("First Tower: ");
-		String firstTower = scanner.nextLine();
-		TowerColor movingTower = TowerColor.valueOf(firstTower);
-		TowerColor nextTower; FieldColor landedField;
-		System.out.println("Possible Moves: " + model.getPossibleMoves(TowerColor.valueOf(firstTower)));
 		
-		System.out.println("New xPos: ");
-		x = scanner.nextInt();
-		
-		System.out.println("New yPos: ");
-		y = scanner.nextInt();
-		
-		String in = "start";
-
-		
-		while(!in.equals("stop")) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				logger.warning(e.toString());
-				e.printStackTrace();
-			}
-			
-			char color = movingTower.toString().charAt(0);
-			char nextColor = movingTower.toString().charAt(0) == 'B' ? 'W' : 'B';
-			
-			if(y == 0 || y == 7 ) {System.out.println(color + " Player won!!"); break;}
-			
-			model.moveTower(movingTower, x, y);
-			landedField = model.getFieldColor(x, y);
-			nextTower = TowerColor.valueOf(nextColor + landedField.toString());
-			
-			System.out.println("Next Tower: " + nextTower);
-			System.out.println("Possible Moves: " + model.getPossibleMoves(nextTower));
-			
-			System.out.println("New xPos: ");
-			x = scanner.nextInt();
-			
-			System.out.println("New yPos: ");
-			y = scanner.nextInt();
-			
-			movingTower = nextTower;			
-		}
-		scanner.close();
-		System.exit(0);
+		Platform.exit();
 	}
 	
 }

@@ -13,8 +13,9 @@ import org.json.simple.parser.JSONParser;
 
 import javafx.beans.property.SimpleStringProperty;
 
-public class KamisadoServerModel{
+public class ServerModel{
 	Logger logger = Logger.getLogger("");
+	String br = System.getProperty("line.separator");
 	
 	final int boardSize = 8;
 	private FieldColor[][] gameboard;
@@ -43,18 +44,18 @@ public class KamisadoServerModel{
 						//Connect 1st Player
 						socketPlB = listener.accept();
 						newMsgGui.set("Player1 (black) connected: " + socketPlB.toString());
-						KamisadoServerClientThread clientPlayerBlack = new KamisadoServerClientThread(KamisadoServerModel.this, socketPlB, true);
+						ServerClientThread clientPlayerBlack = new ServerClientThread(ServerModel.this, socketPlB, true);
 						new Thread(clientPlayerBlack).start();
 						
 						//Connect 2nd Player
 						socketPlW = listener.accept();
 						newMsgGui.set("Player2 (white) connected: " + socketPlW.toString());
-						KamisadoServerClientThread clientPlayerWhite = new KamisadoServerClientThread(KamisadoServerModel.this, socketPlW, false);
+						ServerClientThread clientPlayerWhite = new ServerClientThread(ServerModel.this, socketPlW, false);
 						new Thread(clientPlayerWhite).start();
 						
 						listener.close();
 						
-						Thread.sleep(5000); //Let first the introductions arrive
+						Thread.sleep(2000); //Let first the introductions arrive
 					}catch(Exception e){
 						logger.warning(e.toString());
 						e.printStackTrace();
@@ -100,11 +101,11 @@ public class KamisadoServerModel{
 		try {
 			if(plCol == 'B'){
 				out = new OutputStreamWriter(this.socketPlB.getOutputStream());
-				out.write(msg + "\n");
+				out.write(msg + br);
 				out.flush();
 			}else if(plCol == 'W'){
 				out = new OutputStreamWriter(this.socketPlW.getOutputStream());
-				out.write(msg + "\n");
+				out.write(msg + br);
 				out.flush();
 			}else {
 				logger.warning("Receiver does not exist!");
@@ -115,9 +116,14 @@ public class KamisadoServerModel{
 		}
 	}
 	
-	public void printTowerPos(TowerColor towerColor) {
-		Integer[] pos = this.getTowerPos(towerColor);
-		logger.info(towerColor.toString() + " is located at: " + pos[0] + " " + pos[1]);
+	public void printTowerPos() {
+		for(int x = 0; x < 8; x++) {
+			for(int y = 0; y < 8; y++) {
+				if(this.towerPositions[x][y] != null) {
+						logger.info(this.towerPositions[x][y].toString() + " is located at: " + x + " " + y);
+				}
+			}
+		}
 	}
 	
 	public Integer[] getTowerPos(TowerColor towerColor) {
@@ -137,11 +143,12 @@ public class KamisadoServerModel{
 	
 	public void moveTower(TowerColor towerColor, int xPos, int yPos) {		
 		//Remove the tower from old position
-		int x = getTowerPos(towerColor)[0];
-		int y = getTowerPos(towerColor)[1];
+		Integer[] pos = this.getTowerPos(towerColor);
+		int x = pos[0];
+		int y = pos[1];
 		this.towerPositions[x][y] = null;
 
-		//Put tower to new positions
+		//Put tower to new position
 		if(this.towerPositions[xPos][yPos] != null) {
 			logger.warning("Field already taken!");
 		}else {this.towerPositions[xPos][yPos] = towerColor;}

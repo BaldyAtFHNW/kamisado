@@ -15,16 +15,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-public class KamisadoServerView {
+public class ServerView {
 	private Logger logger = Logger.getLogger("");
 	private Stage stage;
-	private KamisadoServerModel model;
+	private ServerModel model;
 	
 	public Button startSrv;
 	public Button endSrv;
 	public TextArea info;
 
-	public KamisadoServerView(Stage stage, KamisadoServerModel model) {
+	public ServerView(Stage stage, ServerModel model) {
 		this.stage = stage;
 		this.model = model;
 		
