@@ -3,6 +3,7 @@ package kamisado_server;
 import java.net.InetAddress;
 import java.util.logging.Logger;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -62,7 +63,7 @@ public class ServerView {
 	}
 
 	public void stop() {
-		stage.hide();
+		Platform.exit();
 	}
 	
 	public Stage getStage() {

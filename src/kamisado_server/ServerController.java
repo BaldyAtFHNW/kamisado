@@ -1,22 +1,19 @@
 package kamisado_server;
 
-import java.util.Scanner;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
 import javafx.application.Platform;
 
 public class ServerController{
 	private Logger logger = Logger.getLogger("");
 	private ServerModel model;
 	private ServerView view;
+	String br = System.getProperty("line.separator");
 	
 	public ServerController(ServerModel model, ServerView view){
 		this.model = model;
 		this.view = view;
-		
-		//testOnlyWithServer();
 		
 		model.newestMsgPlBlack.addListener( (o, oldValue, newValue) -> processMsg(newValue, 'B'));
 		model.newestMsgPlWhite.addListener( (o, oldValue, newValue) -> processMsg(newValue, 'W'));
@@ -43,11 +40,12 @@ public class ServerController{
 	        	break;
 	        case "end":				processEnd(json, plColor);// can only be surrendering
         		break;
+	        case "leave":			processLeave(plColor);
+    			break;
 	        default: 				logger.warning("Invalid Type");
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void processIntroduction(JSONObject json, char plColor){
 		String name = (String) json.get("name");
 		if(plColor == 'B') {
@@ -75,7 +73,6 @@ public class ServerController{
 	@SuppressWarnings("unchecked")
 	private void processMove(JSONObject json, char plColor){
 		char nextPlayer = plColor == 'B' ? 'W' : 'B';
-		boolean wasBlocked;
 		String movedTwrStr = (String) json.get("towerColor");
 		TowerColor movedTwr = TowerColor.valueOf(movedTwrStr);
 		Long x = (long) json.get("xPos");
@@ -93,16 +90,16 @@ public class ServerController{
 		JSONArray possibleMoves = model.getPossibleMoves(nextTwr);
 		
 		if(possibleMoves.isEmpty()) {	//Player is blocked
-//			//Inform Players
-//			String nameBlockedPl = plColor == 'B' ? model.namePlB : model.namePlW;
-//			JSONObject newJSON = new JSONObject();
-//			newJSON.put("type", "chat");
-//			newJSON.put("msg", nameBlockedPl + " is blocked!");
-//			//model.send(newJSON.toString(), 'B');							<------------ not implemented on client side, yet
-//			//model.send(newJSON.toString(), 'W');							<------------ not implemented on client side, yet
+			//Inform Players
+			String nameBlockedPl = plColor == 'B' ? model.namePlB : model.namePlW;
+			JSONObject newJSON = new JSONObject();
+			newJSON.put("type", "chat");
+			newJSON.put("msg", nameBlockedPl + " is blocked!");
+			model.send(newJSON.toString(), 'B');
+			model.send(newJSON.toString(), 'W');
 			
 			//Update move on blocked Players Gameboard
-			JSONObject newJSON = new JSONObject();
+			newJSON = new JSONObject();
 			newJSON.put("type", "requestMove");
 			newJSON.put("movedTower", movedTwrStr);
 			newJSON.put("xPos", newXPos);
@@ -155,13 +152,23 @@ public class ServerController{
 		json_loser.put("won", false);
 		json_loser.put("reason", "surrender");
 		
-		char winnerCol = (surrenderer == 'W') ? 'B' : 'W';
+		char winnerCol;
+		if(surrenderer == 'B') { 	//Black Player won
+			winnerCol = 'W';
+			model.scoreW ++;
+		}else {					//White Player won
+			winnerCol = 'B';
+			model.scoreB ++;
+		}
+		
 		model.send(json_winner.toString(), winnerCol);
 		model.send(json_loser.toString(), surrenderer);
+		
+		model.initGame(surrenderer);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void plrWon(char winnerCol) {
+	private void plrWon(char winnerCol) {		
 		JSONObject json_winner = new JSONObject();
 		json_winner.put("type", "end");
 		json_winner.put("won", true);
@@ -173,10 +180,33 @@ public class ServerController{
 		json_loser.put("reason", "ended");
 		
 		char looserCol = (winnerCol == 'W') ? 'B' : 'W';
+		if(winnerCol == 'B') { 	//Black Player won
+			looserCol = 'W';
+			model.scoreB ++;
+		}else {					//White Player won
+			looserCol = 'B';
+			model.scoreW ++;
+		}
+		
 		model.send(json_winner.toString(), winnerCol);
 		model.send(json_loser.toString(), looserCol);
 		
-		Platform.exit();
+		model.initGame(looserCol);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void processLeave(char plColor) {
+		char playerStillThere = plColor == 'B' ? 'W' : 'B';
+		JSONObject json = new JSONObject();
+		json.put("type", "leave");
+		model.send(json.toString(), playerStillThere);
+		model.newMsgGui.set("One of the Players left and the game got aborted." + br + "The server application will close in 10 secs.");
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		view.stop();
 	}
 	
 }

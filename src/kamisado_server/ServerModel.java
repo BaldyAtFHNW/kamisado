@@ -1,10 +1,12 @@
 package kamisado_server;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import org.json.simple.JSONArray;
@@ -30,6 +32,9 @@ public class ServerModel{
 
 	protected SimpleStringProperty newestMsgPlBlack = new SimpleStringProperty();
 	protected SimpleStringProperty newestMsgPlWhite = new SimpleStringProperty();
+	
+	protected int scoreB = 0;
+	protected int scoreW = 0;
 	
 	protected SimpleStringProperty newMsgGui = new SimpleStringProperty();
 	
@@ -60,7 +65,15 @@ public class ServerModel{
 						logger.warning(e.toString());
 						e.printStackTrace();
 					}
-					initGame(); //Start game by sending initialization messages to both clients
+					
+					Random random = new Random(); //from: https://stackoverflow.com/questions/8878015/return-true-or-false-randomly
+					char firstMove;
+					if(random.nextBoolean()) {
+						firstMove = 'W';
+					}else {
+						firstMove = 'B';
+					}
+					initGame(firstMove); //Start game by sending initialization messages to both clients
 				}
 			};
 			Thread t = new Thread(r, "ServerSocket");
@@ -72,23 +85,32 @@ public class ServerModel{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void initGame(){
+	public void initGame(char firstMove){
 		this.initGameBoard();
 		this.initTowers();
 		
-		logger.info("Name White Player: " + namePlW);
 		JSONObject initPlayerBlack = new JSONObject();
 		initPlayerBlack.put("type", "init");
 		initPlayerBlack.put("black", true);
-		initPlayerBlack.put("start", true);
 		initPlayerBlack.put("opponent", namePlW);
+		initPlayerBlack.put("score", this.scoreB);
+		initPlayerBlack.put("op_score", this.scoreW);
 		
-		logger.info("Name Black Player: " + namePlB);
 		JSONObject initPlayerWhite = new JSONObject();
 		initPlayerWhite.put("type", "init");
 		initPlayerWhite.put("black", false);
-		initPlayerWhite.put("start", false);
 		initPlayerWhite.put("opponent", namePlB);
+		initPlayerWhite.put("score", this.scoreW);
+		initPlayerWhite.put("op_score", this.scoreB);
+		
+		//Set the first move
+		if(firstMove == 'B') {
+			initPlayerBlack.put("start", true);
+			initPlayerWhite.put("start", false);
+		}else {
+			initPlayerBlack.put("start", false);
+			initPlayerWhite.put("start", true);
+		}
 		
 		this.send(initPlayerBlack.toString(), 'B');
 		this.send(initPlayerWhite.toString(), 'W');

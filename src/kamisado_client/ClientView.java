@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -34,14 +35,18 @@ public class ClientView {
 	private Logger logger = Logger.getLogger("");
 	private Stage stage;
 	private ClientModel model;
-	protected Button giveUp;
 	GridPane gameBoard;
-	
-	
+
 	public TextArea lastMoves;
 	public TextArea chatArea;
 	public TextField chatTxt;
 	public Button chatBtn;
+	
+	public Label playerName;
+	public Label opponentName;
+	public Label playerScore;
+	public Label opponentScore;
+	public Button giveUp;
 
 	final int FIELD_SIZE = 70;
 	final int STROKE_WIDTH = 10;
@@ -60,10 +65,28 @@ public class ClientView {
 			@Override
 			public void run() {
 				HBox root = new HBox();
-				VBox left = new VBox();
+				VBox right = new VBox();
 				gameBoard = new GridPane();
-				
 				HBox chat = new HBox();
+				
+				GridPane scoreBoard = new GridPane();
+				Label scores = new Label("Scores");
+				playerName = new Label("You");
+				opponentName = new Label("");
+				playerScore = new Label("");
+				opponentScore = new Label("");
+				giveUp = new Button("Give Up");
+				
+				scoreBoard.add(scores, 0, 0);
+				scoreBoard.add(playerName, 0, 1);
+				scoreBoard.add(opponentName, 0, 2);
+				scoreBoard.add(playerScore, 1, 1);
+				scoreBoard.add(opponentScore, 1, 2);
+				scoreBoard.add(giveUp, 3, 2);
+				
+				scoreBoard.setHgap(5);
+				scoreBoard.setVgap(5);
+				scoreBoard.setPadding(new Insets(10,10,10,5));
 				
 				lastMoves = new TextArea();
 				lastMoves.setEditable(false);
@@ -72,8 +95,8 @@ public class ClientView {
 				
 				chatArea = new TextArea();
 				chatArea.setEditable(false);
-				chatArea.setMaxSize(434, 434);
-				chatArea.setMinSize(434, 434);
+				chatArea.setMaxSize(434, 334);
+				chatArea.setMinSize(434, 334);
 				
 				chatTxt = new TextField();
 				chatTxt.setMaxWidth(354);
@@ -86,8 +109,8 @@ public class ClientView {
 				//giveUp = new Button("Give Up");
 				
 				chat.getChildren().addAll(chatTxt, chatBtn);
-				left.getChildren().addAll(lastMoves, chatArea, chat);
-				root.getChildren().addAll(gameBoard, left);
+				right.getChildren().addAll(scoreBoard, lastMoves, chatArea, chat);
+				root.getChildren().addAll(gameBoard, right);
 				
 				createFields();
 				createTowers();
@@ -249,9 +272,22 @@ public class ClientView {
 					alert.setContentText("Your opponent reached your baseline.");
 				}
 				alert.showAndWait();
-				Platform.exit();
 			}
 		});
+	}
+	
+	public void showOpponentLeft() {
+		Platform.runLater(new Runnable(){
+			@Override
+			public void run() {			
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Kamisado by ShortyNBaldy - Client");
+				alert.setHeaderText("Sorry, your opponent left.");
+				alert.setContentText("The Application will close now.");
+				alert.showAndWait();
+				stop();
+			}
+		});	
 	}
 	
 	public void start() {
@@ -259,7 +295,7 @@ public class ClientView {
 	}
 
 	public void stop() {
-		stage.hide();
+		model.sendLeave();
 		Platform.exit();
 	}
 

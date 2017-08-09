@@ -28,6 +28,9 @@ public class ClientModel {
 	public boolean start;
 	public String opponent;
 	
+//	protected int playerScore = 0;
+//	protected int opponentScore = 0;
+	
 	String br = System.getProperty("line.separator");
 	
 	public ClientModel(String ip, String playerName) {
@@ -88,6 +91,13 @@ public class ClientModel {
 		json.put("type", "chat");
 		json.put("msg", msg);
 		
+		this.send(json.toString());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void sendLeave() {		
+		JSONObject json = new JSONObject();
+		json.put("type", "leave");
 		this.send(json.toString());
 	}
 	

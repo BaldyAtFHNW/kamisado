@@ -1,14 +1,10 @@
 package kamisado_client;
 
-import java.io.OutputStreamWriter;
-import java.net.Socket;
 import java.util.Iterator;
 import java.util.logging.Logger;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 
@@ -16,7 +12,6 @@ public class ClientController {
 	private Logger logger = Logger.getLogger("");
 	final private ClientModel model;
 	final private ClientView view;
-	private boolean running = true;	
 	
 	String br = System.getProperty("line.separator");
 	
@@ -51,8 +46,8 @@ public class ClientController {
 	        	break;
 	        case "end":				processEnd(json);
 	    		break;
-	        //case "reset":			processReset(json);     <------------ not needed anymore
-	        //	break;
+	        case "leave":			processLeave();
+    			break;
 	        default: 				logger.warning("Invalid Type");
 		}
 	}
@@ -61,15 +56,26 @@ public class ClientController {
 		model.black = (boolean) json.get("black");
 		model.start = (boolean) json.get("start");
 		model.opponent = (String) json.get("opponent");
+		Long playerScore = (long) json.get("score");
+		Long opponentScore = (long) json.get("op_score");
 		
 		view.initGame();
 		
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			logger.warning(e.toString());
 			e.printStackTrace();
 		}
+		
+		Platform.runLater(new Runnable(){
+			@Override
+			public void run() {
+				view.playerScore.setText(playerScore.toString());
+				view.opponentScore.setText(opponentScore.toString());
+				view.opponentName.setText((String) json.get("opponent"));
+			}
+		});
 		
 		view.lastMoves.appendText("You are playing against " + model.opponent + br);
 		if(model.black) {
@@ -92,6 +98,13 @@ public class ClientController {
 				model.sendChatMsg(view.chatTxt.getText());
 				view.chatTxt.setText("");
 	        }
+		});
+		view.getStage().setOnCloseRequest((event)->{
+			model.sendLeave();
+			view.stop();
+		});
+		view.giveUp.setOnAction((event)->{
+			model.surrender();
 		});
 	}
 	
@@ -153,4 +166,7 @@ public class ClientController {
 		view.showEnd(won, reason);
 	}
 	
+	private void processLeave() {
+		view.showOpponentLeft();
+	}
 }

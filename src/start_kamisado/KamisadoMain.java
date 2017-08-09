@@ -28,6 +28,8 @@ public class KamisadoMain extends Application{
 	private ClientController clientController;
 	
 	private ConnectGUI connectGUI;
+	
+	String br = System.getProperty("line.separator");
 
 	//Source: http://code.makery.ch/blog/javafx-dialogs-official/
 	public static void main(String[] args) {
@@ -75,10 +77,9 @@ public class KamisadoMain extends Application{
 	}
 	
 	public void startKamisadoClient(Stage clientStage) {
-		//Stage clientStage = new Stage();
+		connectGUI.connected.setText("Connected" + br + "pending for 2nd player..");
 		clientModel = new ClientModel(connectGUI.txtIP.getText(), connectGUI.txtName.getText());
 		clientView = new ClientView(clientStage, clientModel);
-		//pendingGUI = new PendingForStartGUI(clientStage);
 		clientController = new ClientController(clientModel, clientView);
 		clientView.start();  //fix, otherwise not JavaFX thread
 	}

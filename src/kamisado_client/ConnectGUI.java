@@ -11,12 +11,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class ConnectGUI {
 	public Button connect;
 	public TextField txtName;
 	public TextField txtIP;
+	public Label connected;
 	
 	public ConnectGUI(Stage stage) {
 		BorderPane root = new BorderPane();
@@ -35,11 +37,15 @@ public class ConnectGUI {
 		txtName = new TextField("Your Name");
 		txtIP = new TextField("127.0.0.1");
 		
+		connected = new Label("");
+		connected.setTextFill(Color.GREEN);
+		
 		grid.add(lblName, 0, 0);
 		grid.add(lblIP, 0, 1);
 		grid.add(txtName, 1, 0);
 		grid.add(txtIP, 1, 1);
 		grid.add(connect, 2, 1);
+		grid.add(connected, 3, 1);
 		
 		grid.setHgap(10);
 		grid.setVgap(10);
