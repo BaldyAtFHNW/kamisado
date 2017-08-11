@@ -4,7 +4,6 @@ import java.util.Random;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import javafx.application.Platform;
 
 public class ServerController{
 	private Logger logger = Logger.getLogger("");

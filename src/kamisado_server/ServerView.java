@@ -1,13 +1,8 @@
 package kamisado_server;
 
-import java.net.InetAddress;
-import java.util.logging.Logger;
-
 import org.json.simple.JSONObject;
-
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -19,7 +14,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class ServerView {
-	private Logger logger = Logger.getLogger("");
 	private Stage stage;
 	private ServerModel model;
 	

@@ -1,11 +1,9 @@
 package kamisado_client;
 
 import java.util.Optional;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -27,7 +25,6 @@ import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 public class ClientView {
-	private Logger logger = Logger.getLogger("");
 	private Stage stage;
 	private ClientModel model;
 	GridPane gameBoard;

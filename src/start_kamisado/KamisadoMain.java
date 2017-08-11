@@ -22,10 +22,12 @@ import kamisado_server.ServerView;
 public class KamisadoMain extends Application{
 	private ServerModel srvModel;
 	private ServerView srvView;
+	@SuppressWarnings("unused")
 	private ServerController srvController;
 	
 	private ClientModel clientModel;
 	private ClientView clientView;
+	@SuppressWarnings("unused")
 	private ClientController clientController;
 	
 	private ConnectGUI connectGUI;

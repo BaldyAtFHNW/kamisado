@@ -2,22 +2,16 @@ package kamisado_client;
 
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
-
-import javafx.beans.property.SimpleStringProperty;
 
 public class ClientModel {
 	final public String ipAddress;
 	final private int port = 50000;
-	private Logger logger = Logger.getLogger("");
 	protected Socket serverSocket;
 	
 	protected SimpleStringProperty newestMsg = new SimpleStringProperty();
@@ -40,7 +34,6 @@ public class ClientModel {
 		try{
 			this.serverSocket = new Socket(ipAddress, port);
 		}catch(Exception e){
-			logger.warning(e.toString());
 			e.printStackTrace();
 			
 			Alert alert = new Alert(AlertType.WARNING);
@@ -61,7 +54,6 @@ public class ClientModel {
 			out.write(msg + br);
 			out.flush();
 		}catch(Exception e){
-			logger.warning(e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -115,7 +107,6 @@ public class ClientModel {
 			Object obj = parser.parse(msg);
 			json = (JSONObject) obj;
 		} catch (Exception e) {
-			logger.warning(e.toString());
 			e.printStackTrace();
 		}
 		return json;

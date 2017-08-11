@@ -1,6 +1,5 @@
 package kamisado_server;
 
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
