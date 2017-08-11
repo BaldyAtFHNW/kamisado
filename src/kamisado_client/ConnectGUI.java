@@ -12,6 +12,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-08-11
+ *	
+ *	This gui takes the name of the player and the IP Adress of the server.
+ *
+ */
 public class ConnectGUI {
 	public Button connectBtn;
 	public TextField txtName;

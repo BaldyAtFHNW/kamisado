@@ -5,6 +5,15 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.logging.Logger;
 
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-08-11
+ *	This class handles the thread for permanent listening for client communications
+ *
+ *	It is given the color of the player it is listening for in the constructor so we can tell what player it is listening to
+ *
+ */
 public class ServerClientThread implements Runnable{
 	private Logger logger = Logger.getLogger("");
 	ServerModel model;

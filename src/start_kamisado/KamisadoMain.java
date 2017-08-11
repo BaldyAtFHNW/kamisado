@@ -8,7 +8,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.paint.Color;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import kamisado_client.ClientController;
@@ -19,6 +18,13 @@ import kamisado_server.ServerController;
 import kamisado_server.ServerModel;
 import kamisado_server.ServerView;
 
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-08-11
+ *	The starting point of the Kamisado game. The user can start both, client and server, from this starting point.
+ *
+ */
 public class KamisadoMain extends Application{
 	private ServerModel srvModel;
 	private ServerView srvView;

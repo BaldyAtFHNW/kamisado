@@ -7,6 +7,14 @@ import org.json.simple.JSONObject;
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-07-21
+ *	
+ *	The business logic on the client side containing the kamisado rules and how to react to server communications.
+ *
+ */
 public class ClientController {
 	final private ClientModel model;
 	final private ClientView view;
@@ -22,8 +30,12 @@ public class ClientController {
 		sendNameToServer();
 	}
 	
+	/**
+	*	Sends the name of the player to the server
+	 * @return void
+	 */
 	@SuppressWarnings("unchecked")
-	public void sendNameToServer() {
+	protected void sendNameToServer() {
 		JSONObject json = new JSONObject();
 		json.put("type", "introduction");
 		json.put("name", model.getPlayerName());
@@ -31,6 +43,11 @@ public class ClientController {
 		model.send(json.toString());
 	}
 	
+	/**
+	 * Calls the needed methods depending on which communication type arrived
+	 * @param String message
+	 * @return void
+	 */
 	private void processMsg(String msg) {
 		JSONObject json = model.parseJSON(msg);
 		String type = (String) json.get("type");
@@ -54,6 +71,11 @@ public class ClientController {
 		}
 	}
 	
+	/**
+	 * Reacts to the communication type "init"
+	 * @param JSONObject json
+	 * @return void
+	 */
 	private void processInit(JSONObject json) {
 		model.black = (boolean) json.get("black");
 		model.opponentName = (String) json.get("opponent");
@@ -107,6 +129,11 @@ public class ClientController {
 		});
 	}
 	
+	/**
+	 * Reacts to the communication type "chat"
+	 * @param JSONObject json
+	 * @return void
+	 */
 	private void processChatMsg(JSONObject json){
 		view.chatArea.appendText((String)json.get("msg") + br);
 	}
@@ -126,6 +153,11 @@ public class ClientController {
 		view.moveTower(tower, xPos, yPos);
 	}
 	
+	/**
+	 * Reacts to the communication type "requestMove"
+	 * @param JSONObject json
+	 * @return void
+	 */
 	private void processRequestMove(JSONObject json){
 		//Display Possible Moves
 		String towerToMove = (String) json.get("nextTower");
@@ -148,6 +180,11 @@ public class ClientController {
 		view.lastMoves.appendText("Your Turn!" + br);
 	}
 	
+	/**
+	 * Reacts to the communication type "end"
+	 * @param JSONObject json
+	 * @return void
+	 */
 	private void processEnd(JSONObject json){
 		boolean won = (boolean) json.get("won");
 		String reason = (String) json.get("reason");
@@ -164,6 +201,11 @@ public class ClientController {
 		}
 	}
 	
+	/**
+	 * Reacts to the communication type "restart"
+	 * @param JSONObject json
+	 * @return void
+	 */
 	private void processRestart(JSONObject json) {
 		Boolean start = (boolean) json.get("start");
 		Long playerScore = (long) json.get("score");
@@ -187,6 +229,11 @@ public class ClientController {
 		});
 	}
 	
+	/**
+	 * Reacts to the communication type "leave"
+	 * @param JSONObject json
+	 * @return void
+	 */
 	private void processLeave() {
 		view.showOpponentLeft();
 	}

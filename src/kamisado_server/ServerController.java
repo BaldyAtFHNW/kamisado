@@ -1,11 +1,17 @@
 package kamisado_server;
 
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-08-11
+ *	The business logic and the rules of the game are handled within the controller.
+ *
+ */
 public class ServerController {
 	private Logger logger = Logger.getLogger("");
 	private ServerModel model;

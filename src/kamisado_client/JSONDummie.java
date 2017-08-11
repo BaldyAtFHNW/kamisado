@@ -1,23 +1,19 @@
 package kamisado_client;
 
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-07-21
+ *	@deprecated
+ *	
+ *	This class was only used for testing. It simulated server communications before the server was actually ready.
+ *
+ */
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 
-public class JSONDummie {
-	
-	/* 
-	Hey Liz
-	This is the DummieClass I told you about
-	Put an observer on the variable obj just below and simulate a server response 
-	by calling one of the methods below (they then fill the obj variable)
-	
-	In case you'd like to try it, I've put a little test into "Kamisado_Client_Main"
-	It creates this dummie and reads out the JSON-Object for "requestMove"
-	
-	Don't forget to call clearJSONObject() if you'd like to simulate several communications after each other
-	*/
-	
+public class JSONDummie {	
 	
 	private JSONObject obj;
 	
@@ -33,10 +29,7 @@ public class JSONDummie {
 		this.obj.clear();
 	}
 	
-	
-	
-	
-	
+
 	//Different Methods for filling the Object from here:
 	
 	@SuppressWarnings("unchecked")

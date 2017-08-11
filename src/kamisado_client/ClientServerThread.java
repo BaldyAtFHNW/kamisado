@@ -5,6 +5,13 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.logging.Logger;
 
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-08-11
+ *	This class handles the thread for permanent listening for server communications
+ *
+ */
 public class ClientServerThread implements Runnable{
 	Logger logger = Logger.getLogger("");
 	

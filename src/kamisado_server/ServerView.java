@@ -13,6 +13,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-08-11
+ *	A little server view just to keep track of what is going on.
+ *
+ */
 public class ServerView {
 	private Stage stage;
 	private ServerModel model;

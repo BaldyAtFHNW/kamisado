@@ -24,21 +24,28 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
+/**
+ * 
+ * 	@author Sevjakova Jelizaveta
+ * 	@date 2017-08-11
+ *	All GUI operations for the Kamisado game are in this class.
+ *
+ */
 public class ClientView {
 	private Stage stage;
 	private ClientModel model;
 	GridPane gameBoard;
 
-	public TextArea lastMoves;
-	public TextArea chatArea;
-	public TextField chatTxt;
-	public Button chatBtn;
+	protected TextArea lastMoves;
+	protected TextArea chatArea;
+	protected TextField chatTxt;
+	protected Button chatBtn;
 	
-	public Label playerName;
-	public Label opponentName;
-	public Label playerScore;
-	public Label opponentScore;
-	public Button giveUpBtn;
+	protected Label playerName;
+	protected Label opponentName;
+	protected Label playerScore;
+	protected Label opponentScore;
+	protected Button giveUpBtn;
 
 	final int FIELD_SIZE = 70;
 	final int STROKE_WIDTH = 10;
@@ -53,7 +60,7 @@ public class ClientView {
 		this.model = model;
 	}
 	
-	public void initGame() {
+	protected void initGame() {
 		Platform.runLater(new Runnable(){
 			@Override
 			public void run() {
@@ -128,12 +135,22 @@ public class ClientView {
 
 	}
 	
-	public void restart() {
+	/**
+	 * Rebuilds the gui and puts all towers back to their starting position.
+	 */
+	protected void restart() {
 		hideAllTowers();
 		createTowers();
 	}
 
-	public void moveTower(String towerToMove, int col, int row) {
+	/**
+	 * Moves a tower from one cell to another on the gameboard
+	 * @param String towerToMove
+	 * @param int column
+	 * @param int row
+	 * @return void
+	 */
+	protected void moveTower(String towerToMove, int col, int row) {
 			Platform.runLater(new Runnable(){
 				@Override
 				public void run() {					
@@ -152,7 +169,16 @@ public class ClientView {
 			});
 	}
 
-	public void showPossibleMove(String towerToMove, int col, int row) {
+	/**
+	 * Displays a grey token on the field to show a possible move and makes it clickable
+	 * If the client is the "black" player it shows a diamond.
+	 * If the client is the "white" player it shows a circle.
+	 * @param String towerToMove
+	 * @param int column
+	 * @param int row
+	 * @return void
+	 */
+	protected void showPossibleMove(String towerToMove, int col, int row) {
 		Platform.runLater(new Runnable(){
 			@Override
 			public void run() {		
@@ -190,7 +216,11 @@ public class ClientView {
 		});
 	}
 	
-	public void hideAllMoves() {
+	/**
+	 * Removes all possible moves from the gameboard
+	 * @return void
+	 */
+	protected void hideAllMoves() {
 		for (Node node : gameBoard.getChildren()) {
 			if(node.getId() != null) {
 				if(node.getId().equals("imaginary")) {
@@ -205,7 +235,11 @@ public class ClientView {
 		}
 	}
 	
-	public void hideAllTowers() {
+	/**
+	 * Removes All towers from the gameboard
+	 * @return void
+	 */
+	protected void hideAllTowers() {
 		for (Node node : gameBoard.getChildren()) {
 			if(node.getId() != null) {
 				Platform.runLater(new Runnable(){
@@ -218,15 +252,26 @@ public class ClientView {
 		}
 	}
 
-	public void firstMove() {
+	/**
+	 * Makes the clients own tokens clickable for the very first move depending on which color this client is
+	 * @return void
+	 */
+	protected void firstMove() {
 		if (model.black) {
 			activateTowers('B');
 		} else {
 			activateTowers('W');
 		}
 	}
-
-	public void activateTowers(char playerCol) {
+	
+	/**
+	 * Adds hover actions to the tokens which show the possible moves
+	 * Needed for the very first move
+	 * playerCol is either W or B
+	 * @param char 
+	 * @return void
+	 */
+	protected void activateTowers(char playerCol) {
 		for (Node node : gameBoard.getChildren()) {
 			if(node.getId() != null) {
 				if(node.getId().charAt(0) == playerCol) {
@@ -247,7 +292,14 @@ public class ClientView {
 		}
 	}
 	
-	public void deActivateTowers(char playerCol) {
+	/**
+	 * Needed during the very first move.
+	 * Deactivates the towers again.
+	 * playerCol is either W or B
+	 * @param char 
+	 * @return void
+	 */
+	protected void deActivateTowers(char playerCol) {
 		for (Node node : gameBoard.getChildren()) {
 			if(node.getId() != null) {
 				if(node.getId().charAt(0) == playerCol) {
@@ -258,7 +310,14 @@ public class ClientView {
 		}
 	}
 	
-	public void activateFirstMoveFields(String tower, final int towerCol, final int towerRow) {
+	/**
+	 * Puts "possible move tokens" on the game board depending on the inputs
+	 * @param String tower 
+	 * @param int towerColumn
+	 * @param int towerRow
+	 * @return void
+	 */
+	protected void activateFirstMoveFields(String tower, final int towerCol, final int towerRow) {
 		int col; int row;
 		
 		col = towerCol;
@@ -293,7 +352,14 @@ public class ClientView {
 		
 	}
 	
-	public void showEnd(boolean won, String reason) {
+	/**
+	 * Displays the end message accordingly to win or loss
+	 * reason can either be "end", "surrender" or "deadlock"
+	 * @param boolean won
+	 * @param String reason
+	 * @return void
+	 */
+	protected void showEnd(boolean won, String reason) {
 		Platform.runLater(new Runnable(){
 			@Override
 			public void run() {				
@@ -322,7 +388,11 @@ public class ClientView {
 		});
 	}
 	
-	public void showDeadlock() {
+	/**
+	 * Shows deadlock end
+	 * @return void
+	 */
+	protected void showDeadlock() {
 		Platform.runLater(new Runnable(){
 			@Override
 			public void run() {				
@@ -337,7 +407,7 @@ public class ClientView {
 		});
 	}
 	
-	public void showOpponentLeft() {
+	protected void showOpponentLeft() {
 		Platform.runLater(new Runnable(){
 			@Override
 			public void run() {			
@@ -351,7 +421,7 @@ public class ClientView {
 		});	
 	}
 	
-	public void giveUp() {
+	protected void giveUp() {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Kamisado by ShortyNBaldy - Client");
 		alert.setHeaderText("You are about to give up.");
@@ -378,10 +448,14 @@ public class ClientView {
 		Platform.exit();
 	}
 
-	public Stage getStage() {
+	protected Stage getStage() {
 		return stage;
 	}
 	
+	/**
+	 * Puts the tokens on the gameboard
+	 * @return void
+	 */
 	private void createTowers() {
 		// create black towers and set them to the initial position
 		
@@ -603,6 +677,10 @@ public class ClientView {
 		}
 	}
 	
+	/**
+	 * Creates the rectangles needed to form the gameboard
+	 * @return void
+	 */
 	private void createFields() {
 		Rectangle a = new Rectangle();
 		a.setWidth(FIELD_SIZE);
@@ -652,7 +730,6 @@ public class ClientView {
 		h.setFill(Color.BROWN);
 		gameBoard.add(h, 7, 0);
 
-		// second row
 		Rectangle i = new Rectangle();
 		i.setWidth(FIELD_SIZE);
 		i.setHeight(FIELD_SIZE);
@@ -701,7 +778,6 @@ public class ClientView {
 		p.setFill(Color.PURPLE);
 		gameBoard.add(p, 7, 1);
 
-		// THIRD ROW
 		Rectangle r = new Rectangle();
 		r.setWidth(FIELD_SIZE);
 		r.setHeight(FIELD_SIZE);
@@ -749,8 +825,6 @@ public class ClientView {
 		y.setHeight(FIELD_SIZE);
 		y.setFill(Color.BLUE);
 		gameBoard.add(y, 7, 2);
-
-		// fourth
 
 		Rectangle aa = new Rectangle();
 		aa.setWidth(FIELD_SIZE);
@@ -800,7 +874,6 @@ public class ClientView {
 		hh.setFill(Color.YELLOW);
 		gameBoard.add(hh, 7, 3);
 
-		// eight row
 		Rectangle ii = new Rectangle();
 		ii.setWidth(FIELD_SIZE);
 		ii.setHeight(FIELD_SIZE);
@@ -849,7 +922,6 @@ public class ClientView {
 		pp.setFill(Color.BROWN);
 		gameBoard.add(pp, 0, 7);
 
-		// seventh row
 		Rectangle qq = new Rectangle();
 		qq.setWidth(FIELD_SIZE);
 		qq.setHeight(FIELD_SIZE);
@@ -898,7 +970,6 @@ public class ClientView {
 		xx.setFill(Color.PURPLE);
 		gameBoard.add(xx, 0, 6);
 
-		// sixth
 		Rectangle aaa = new Rectangle();
 		aaa.setWidth(FIELD_SIZE);
 		aaa.setHeight(FIELD_SIZE);
@@ -946,8 +1017,6 @@ public class ClientView {
 		hhh.setHeight(FIELD_SIZE);
 		hhh.setFill(Color.BLUE);
 		gameBoard.add(hhh, 0, 5);
-
-		// fifth
 
 		Rectangle iii = new Rectangle();
 		iii.setWidth(FIELD_SIZE);

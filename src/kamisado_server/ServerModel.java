@@ -15,6 +15,13 @@ import org.json.simple.parser.JSONParser;
 
 import javafx.beans.property.SimpleStringProperty;
 
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-08-11
+ *	Communication with the clients and numbercrunching is executed within the model.
+ *
+ */
 public class ServerModel{
 	Logger logger = Logger.getLogger("");
 	String br = System.getProperty("line.separator");
@@ -36,13 +43,14 @@ public class ServerModel{
 	protected int scoreB = 0;
 	protected int scoreW = 0;
 	
-//	protected boolean WPlBlocked = false;
-//	protected boolean BPlBlocked = false;
-	
 	protected SimpleStringProperty newMsgGui = new SimpleStringProperty();
 	
 	protected boolean running = true;
 	
+	/**
+	 * Connects two clients and initalizes the game as soon as done
+	 * @return void
+	 */
 	public void connectClients(){
 		newMsgGui.set("Server started\nPending for players - Please wait");
 		try{
@@ -89,6 +97,11 @@ public class ServerModel{
 		}
 	}
 	
+	/**
+	 * Checks if a tower is blocked
+	 * @param TowerColor tower
+	 * @return boolean isBlocked
+	 */
 	private boolean towerIsBlocked(TowerColor tower) {
 		boolean blocked = false;
 		if (this.getPossibleMoves(tower).isEmpty()){
@@ -97,15 +110,28 @@ public class ServerModel{
 		return blocked;
 	}
 	
-	//returns next tower
+	/**
+	 * Returns the next tower which is being moved according to the game rules
+	 * @param int xPos
+	 * @param int yPos
+	 * @param char nextPlayer
+	 * @return towerColor tower
+	 */
 	private TowerColor getNextTower(int xPos, int yPos, char nextPlayer) {
 		FieldColor landedFieldCol = this.getFieldColor(xPos, yPos);
 		TowerColor nextTwr = TowerColor.valueOf(nextPlayer + landedFieldCol.toString());
 		return nextTwr;
 	}
 	
-	//returns next tower which is not blocked
-	public TowerColor getNextPlayableTower(int xPos, int yPos, char nextPlayer) {
+	/**
+	 * Returns the next tower which is actually playable, taking blocked towers into account
+	 * Checks if there are loops of blocked towers to take deadlocks into account. returns null if deadlock
+	 * @param int xPos
+	 * @param int yPos
+	 * @param char nextPlayer
+	 * @return towerColor tower
+	 */
+	protected TowerColor getNextPlayableTower(int xPos, int yPos, char nextPlayer) {
 		TowerColor nextTower = getNextTower(xPos, yPos, nextPlayer);
 		ArrayList<String> blockedTowers = new ArrayList<String>();
 		while(towerIsBlocked(nextTower)) {
@@ -129,8 +155,13 @@ public class ServerModel{
 		return nextTower;
 	}
 	
+	/**
+	 * Starts the game
+	 * @param char firstPlayer
+	 * @return void
+	 */
 	@SuppressWarnings("unchecked")
-	public void initGame(char firstMove){
+	protected void initGame(char firstMove){
 		this.initGameBoard();
 		this.initTowers();
 		
@@ -163,8 +194,13 @@ public class ServerModel{
 		this.send(initPlayerWhite.toString(), 'W');
 	}
 	
+	/**
+	 * restarts the game
+	 * @param char firstPlayer
+	 * @return void
+	 */
 	@SuppressWarnings("unchecked")
-	public void restartGame(char firstMove){
+	protected void restartGame(char firstMove){
 		this.initGameBoard();
 		this.initTowers();
 		
@@ -193,7 +229,13 @@ public class ServerModel{
 		this.send(initPlayerWhite.toString(), 'W');
 	}
 
-	public void send(String msg, char plCol){
+	/**
+	 * sends a message to a client depending on the char
+	 * @param String jsonString
+	 * @param char toWhichPlayer
+	 * @return void
+	 */
+	protected void send(String msg, char plCol){
 		OutputStreamWriter out;
 		try {
 			if(plCol == 'B'){
@@ -213,7 +255,7 @@ public class ServerModel{
 		}
 	}
 	
-	public void printTowerPos() {
+	protected void printTowerPos() {
 		for(int x = 0; x < 8; x++) {
 			for(int y = 0; y < 8; y++) {
 				if(this.towerPositions[x][y] != null) {
@@ -223,7 +265,7 @@ public class ServerModel{
 		}
 	}
 	
-	public Integer[] getTowerPos(TowerColor towerColor) {
+	protected Integer[] getTowerPos(TowerColor towerColor) {
 		Integer[] towerPos = new Integer[2];
 		for(int x = 0; x < 8; x++) {
 			for(int y = 0; y < 8; y++) {
@@ -238,7 +280,7 @@ public class ServerModel{
 		return towerPos;
 	}
 	
-	public void moveTower(TowerColor towerColor, int xPos, int yPos) {		
+	protected void moveTower(TowerColor towerColor, int xPos, int yPos) {		
 		//Remove the tower from old position
 		Integer[] pos = this.getTowerPos(towerColor);
 		int x = pos[0];
@@ -251,12 +293,12 @@ public class ServerModel{
 		}else {this.towerPositions[xPos][yPos] = towerColor;}
 	}
 	
-	public FieldColor getFieldColor(int xPos, int yPos) {
+	protected FieldColor getFieldColor(int xPos, int yPos) {
 		return this.gameboard[xPos][yPos];
 	}
 	
 	@SuppressWarnings("unchecked")
-	public JSONArray getPossibleMoves(TowerColor towerColor) {
+	protected JSONArray getPossibleMoves(TowerColor towerColor) {
 		Integer[] currentPos = this.getTowerPos(towerColor);
 		char color = towerColor.toString().charAt(0); //Either W or B
 		int currX = currentPos[0];
@@ -305,7 +347,7 @@ public class ServerModel{
 		return possibleMoves;
 	}
 	
-	public JSONObject parseJSON(String msg){
+	protected JSONObject parseJSON(String msg){
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
 		
@@ -319,7 +361,7 @@ public class ServerModel{
 		return json;
 	}
 	
-	public void initTowers(){
+	protected void initTowers(){
 		
 		this.towerPositions = new TowerColor[boardSize][boardSize];
 		//Set all positions to null
@@ -352,7 +394,7 @@ public class ServerModel{
 		this.towerPositions[7][7] = TowerColor.BBROWN;
 	}
 	
-	public void initGameBoard(){
+	protected void initGameBoard(){
 		this.gameboard = new FieldColor[boardSize][boardSize];
 		
 		this.gameboard[0][0] = FieldColor.BROWN;
@@ -428,23 +470,23 @@ public class ServerModel{
 		this.gameboard[7][7] = FieldColor.BROWN;
 	}
 	
-	public String getNamePlB() {
+	protected String getNamePlB() {
 		return namePlB;
 	}
 
-	public void setNamePlB(String namePlB) {
+	protected void setNamePlB(String namePlB) {
 		this.namePlB = namePlB;
 	}
 
-	public String getNamePlW() {
+	protected String getNamePlW() {
 		return namePlW;
 	}
 
-	public void setNamePlW(String namePlW) {
+	protected void setNamePlW(String namePlW) {
 		this.namePlW = namePlW;
 	}
 	
-	public String getIP(){
+	protected String getIP(){
 		String ip = "Couldn't get IP - sorry";
         try {
 			ip = InetAddress.getLocalHost().getHostAddress();

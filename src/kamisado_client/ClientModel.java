@@ -9,6 +9,15 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.application.Platform;
 
+/**
+ * 
+ * 	@author Simon Bieri
+ * 	@date 2017-07-21
+
+ *	This class mainly handles the communication with the server (sending messages)
+ *	But also does some number crunching 
+ *
+ */
 public class ClientModel {
 	final public String ipAddress;
 	final private int port = 50000;
@@ -30,7 +39,11 @@ public class ClientModel {
 		this.playerName = playerName;
 	}
 	
-	public void connectServer(){
+	/**
+	 * Connects to the server
+	 * @return void
+	 */
+	protected void connectServer(){
 		try{
 			this.serverSocket = new Socket(ipAddress, port);
 		}catch(Exception e){
@@ -47,7 +60,12 @@ public class ClientModel {
 		new Thread(server).start();	
 	}
 
-	public void send(String msg){
+	/**
+	 * Sends a string to the server (should always be a jsonObject)
+	 * @param String message
+	 * @return void
+	 */
+	protected void send(String msg){
 		OutputStreamWriter out;
 		try{
 			out = new OutputStreamWriter(this.serverSocket.getOutputStream());
@@ -58,8 +76,15 @@ public class ClientModel {
 		}
 	}
 	
+	/**
+	 * Builds the jsonObject of type "move" to the server
+	 * @param String towerColor
+	 * @param int xPos
+	 * @param int yPos
+	 * @return void
+	 */
 	@SuppressWarnings("unchecked")
-	public void sendMove(String towerColor, int xPos, int yPos) {
+	protected void sendMove(String towerColor, int xPos, int yPos) {
 		if(this.black) { //this is the black client
 			xPos = turnUpsideDown(xPos);
 		}else {
@@ -75,8 +100,13 @@ public class ClientModel {
 		this.send(json.toString());
 	}
 	
+	/**
+	 * Builds the jsonObject of type "chat" to the server
+	 * @param String chatMessage
+	 * @return void
+	 */
 	@SuppressWarnings("unchecked")
-	public void sendChatMsg(String msg) {
+	protected void sendChatMsg(String msg) {
 		JSONObject json = new JSONObject();
 		json.put("type", "chat");
 		json.put("msg", msg);
@@ -84,22 +114,36 @@ public class ClientModel {
 		this.send(json.toString());
 	}
 	
+	/**
+	 * Builds the jsonObject of type "leave" to the server
+	 * This communication is being sent before a client is being closed
+	 * @return void
+	 */
 	@SuppressWarnings("unchecked")
-	public void sendLeave() {		
+	protected void sendLeave() {		
 		JSONObject json = new JSONObject();
 		json.put("type", "leave");
 		this.send(json.toString());
 	}
 	
+	/**
+	 * Builds the jsonObject of type "end" to the server
+	 * @return void
+	 */
 	@SuppressWarnings("unchecked")
-	public void surrender() {		
+	protected void surrender() {		
 		JSONObject json = new JSONObject();
 		json.put("type", "end");
 		json.put("reason", "surrender");
 		this.send(json.toString());
 	}
 	
-	public JSONObject parseJSON(String msg){
+	/**
+	 * Parses a jsonString with the simple json library
+	 * @param String jsonObject.toString()
+	 * @return jsonObject
+	 */
+	protected JSONObject parseJSON(String msg){
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
 		
@@ -112,12 +156,22 @@ public class ClientModel {
 		return json;
 	}
 	
-	public String getPlayerName() {
+	/**
+	 * returns the players name
+	 * @return String playerName
+	 */
+	protected String getPlayerName() {
 		return playerName;
 	}
 	
-	//Changing number values for applying coordinates onto the grid
-	public int turnUpsideDown(int number) {
+	
+	/**
+	 * Replaces numbers from 0 to 7
+	 * Needed for switching from XY koordinates from the server to the gridpane koordinates
+	 * @param int number
+	 * @return int number
+	 */
+	protected int turnUpsideDown(int number) {
 		switch (number) {
 		case 0 : number = 7;
 			break;
