@@ -18,7 +18,7 @@ public class ClientModel {
 	final public String ipAddress;
 	final private int port = 50000;
 	private Logger logger = Logger.getLogger("");
-	private Socket serverSocket;
+	protected Socket serverSocket;
 	
 	protected SimpleStringProperty newestMsg = new SimpleStringProperty();
 	protected SimpleStringProperty latestMove = new SimpleStringProperty();
@@ -28,10 +28,9 @@ public class ClientModel {
 	public boolean start;
 	public String opponent;
 	
-//	protected int playerScore = 0;
-//	protected int opponentScore = 0;
-	
 	String br = System.getProperty("line.separator");
+	
+	protected boolean running = true;
 	
 	public ClientModel(String ip, String playerName) {
 		this.ipAddress = ip;
@@ -105,6 +104,7 @@ public class ClientModel {
 	public void surrender() {		
 		JSONObject json = new JSONObject();
 		json.put("type", "end");
+		json.put("reason", "surrender");
 		this.send(json.toString());
 	}
 	

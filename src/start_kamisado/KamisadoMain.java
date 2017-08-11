@@ -77,7 +77,7 @@ public class KamisadoMain extends Application{
 	}
 	
 	public void startKamisadoClient(Stage clientStage) {
-		connectGUI.connected.setText("Connected" + br + "pending for 2nd player..");
+		connectGUI.connected.setText("Pending for start");
 		clientModel = new ClientModel(connectGUI.txtIP.getText(), connectGUI.txtName.getText());
 		clientView = new ClientView(clientStage, clientModel);
 		clientController = new ClientController(clientModel, clientView);

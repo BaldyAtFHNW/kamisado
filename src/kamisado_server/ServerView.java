@@ -3,6 +3,8 @@ package kamisado_server;
 import java.net.InetAddress;
 import java.util.logging.Logger;
 
+import org.json.simple.JSONObject;
+
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -62,7 +64,18 @@ public class ServerView {
 		stage.show();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void stop() {
+		//Inform Clients
+		JSONObject json = new JSONObject();
+		json.put("type", "leave");
+		if(model.socketPlB.isConnected()) {model.send(json.toString(), 'B');}
+		if(model.socketPlW.isConnected()) {model.send(json.toString(), 'W');}
+		
+		//End threads
+		model.running = false;
+		
+		//Exit
 		Platform.exit();
 	}
 	

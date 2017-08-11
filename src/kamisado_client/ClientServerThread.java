@@ -23,7 +23,7 @@ public class ClientServerThread implements Runnable{
 		
 		try{
 			in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-			while(true){
+			while(model.running){
 				msg = in.readLine();
 				logger.info("Received: " + msg);
 				model.newestMsg.set(msg);

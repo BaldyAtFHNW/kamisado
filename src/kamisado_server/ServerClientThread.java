@@ -25,7 +25,7 @@ public class ServerClientThread implements Runnable{
 		
 		try{
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			while(true){
+			while(model.running){
 				msg = in.readLine();
 				logger.info("Received: " + msg);
 				if(black == true){

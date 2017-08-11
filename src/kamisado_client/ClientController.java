@@ -104,7 +104,7 @@ public class ClientController {
 			view.stop();
 		});
 		view.giveUp.setOnAction((event)->{
-			model.surrender();
+			view.giveUp();
 		});
 	}
 	
@@ -158,6 +158,7 @@ public class ClientController {
 	private void processEnd(JSONObject json){
 		boolean won = (boolean) json.get("won");
 		String reason = (String) json.get("reason");
+		logger.info("Process End - Reason = " + reason);
 		if(won) {
 			view.lastMoves.appendText("You WON!");
 		}else {

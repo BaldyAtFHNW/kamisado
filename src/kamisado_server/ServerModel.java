@@ -24,8 +24,8 @@ public class ServerModel{
 	private TowerColor[][] towerPositions;;
 	
 	ServerSocket listener;
-	private Socket socketPlB;
-	private Socket socketPlW;
+	protected Socket socketPlB;
+	protected Socket socketPlW;
 	
 	protected String namePlB;
 	protected String namePlW;
@@ -37,6 +37,10 @@ public class ServerModel{
 	protected int scoreW = 0;
 	
 	protected SimpleStringProperty newMsgGui = new SimpleStringProperty();
+	
+	protected boolean lastPlayerBlocked = false;
+	
+	protected boolean running = true;
 	
 	public void connectClients(){
 		newMsgGui.set("Server started\nPending for players - Please wait");
@@ -107,15 +111,15 @@ public class ServerModel{
 		if(firstMove == 'B') {
 			initPlayerBlack.put("start", true);
 			initPlayerWhite.put("start", false);
+			this.newMsgGui.set("Game started - Black Player has got the first move");
 		}else {
 			initPlayerBlack.put("start", false);
 			initPlayerWhite.put("start", true);
+			this.newMsgGui.set("Game started - White Player has got the first move");
 		}
 		
 		this.send(initPlayerBlack.toString(), 'B');
 		this.send(initPlayerWhite.toString(), 'W');
-		
-		this.newMsgGui.set("Game started - Black Player has got the first move");
 	}
 
 	public void send(String msg, char plCol){

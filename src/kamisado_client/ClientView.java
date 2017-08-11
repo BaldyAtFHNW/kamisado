@@ -1,16 +1,21 @@
 package kamisado_client;
 
+import java.util.Optional;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -29,6 +34,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 public class ClientView {
@@ -68,6 +74,7 @@ public class ClientView {
 				VBox right = new VBox();
 				gameBoard = new GridPane();
 				HBox chat = new HBox();
+				HBox topRight = new HBox();
 				
 				GridPane scoreBoard = new GridPane();
 				Label scores = new Label("Scores");
@@ -82,7 +89,6 @@ public class ClientView {
 				scoreBoard.add(opponentName, 0, 2);
 				scoreBoard.add(playerScore, 1, 1);
 				scoreBoard.add(opponentScore, 1, 2);
-				scoreBoard.add(giveUp, 3, 2);
 				
 				scoreBoard.setHgap(5);
 				scoreBoard.setVgap(5);
@@ -90,7 +96,7 @@ public class ClientView {
 				
 				lastMoves = new TextArea();
 				lastMoves.setEditable(false);
-				lastMoves.setMaxSize(434, 100);
+				lastMoves.setMaxSize(434, 120);
 				lastMoves.setMinSize(434, 100);
 				
 				chatArea = new TextArea();
@@ -105,11 +111,13 @@ public class ClientView {
 				chatBtn = new Button("Send");
 				chatBtn.setMaxWidth(80);
 				chatBtn.setMinWidth(80);
-
-				//giveUp = new Button("Give Up");
 				
+				giveUp.setTranslateX(280); 		//from: https://stackoverflow.com/questions/30641187/position-javafx-button-in-a-specific-location
+				giveUp.setTranslateY(45);
+				
+				topRight.getChildren().addAll(scoreBoard, giveUp);
 				chat.getChildren().addAll(chatTxt, chatBtn);
-				right.getChildren().addAll(scoreBoard, lastMoves, chatArea, chat);
+				right.getChildren().addAll(topRight, lastMoves, chatArea, chat);
 				root.getChildren().addAll(gameBoard, right);
 				
 				createFields();
@@ -128,18 +136,18 @@ public class ClientView {
 	public void moveTower(String towerToMove, int col, int row) {
 			Platform.runLater(new Runnable(){
 				@Override
-				public void run() {
-					Circle tower = new Circle();
+				public void run() {					
+					Node nodeToMove = null;		//Has to be initialized here.. node WILL be filled; no need to worry about a nullPointerException
 					for (Node node : gameBoard.getChildren()) {
-						if(node instanceof Circle && node.getId().equals(towerToMove)) {
-							tower = (Circle) node;
+						if(node.getId() != null) {
+							if(node.getId().equals(towerToMove)) {
+								nodeToMove = node;
+							}
 						}
 					}
-					gameBoard.getChildren().remove(tower);
-					gameBoard.add(tower, col, row);
-					
-					lastMoves.appendText(tower.getId() + " has been moved to: " + col + " " + row + br);
-					
+					gameBoard.getChildren().remove(nodeToMove);
+					gameBoard.add(nodeToMove, col, row);
+					lastMoves.appendText(nodeToMove.getId() + " has been moved to: " + col + " " + row + br);
 				}
 			});
 	}
@@ -147,34 +155,51 @@ public class ClientView {
 	public void showPossibleMove(String towerToMove, int col, int row) {
 		Platform.runLater(new Runnable(){
 			@Override
-			public void run() {				
-				Circle possTower = new Circle(FIELD_SIZE * SCALEDOWN);
-				possTower.setFill(Color.TRANSPARENT);
-				possTower.setStroke(Color.rgb(200, 200, 200, 0.9));
-				//r2.setFill(Color.rgb(200, 200, 200, 0.5));
-				possTower.setStrokeWidth(STROKE_WIDTH);
-				possTower.setId("imaginary");
-				gameBoard.add(possTower, col, row);
-				
-				possTower.setOnMouseClicked((event) -> {
-					hideAllMoves();
-					moveTower(towerToMove, col, row);
-					model.sendMove(towerToMove, col, row);
-				});
+			public void run() {		
+				if(model.black) {			//If black player, create rectangles
+					Rectangle possTower = new Rectangle();
+					possTower.setWidth(40);
+					possTower.setHeight(40);
+					possTower.getTransforms().add(new Rotate(45,possTower.getWidth()/2,(possTower.getHeight()/2)));
+					GridPane.setHalignment(possTower, HPos.CENTER);
+					possTower.setFill(Color.TRANSPARENT);
+					possTower.setStroke(Color.rgb(200, 200, 200, 0.9));
+					possTower.setId("imaginary");
+					possTower.setStrokeWidth(STROKE_WIDTH);
+					gameBoard.add(possTower, col, row);
+					possTower.setOnMouseClicked((event) -> {
+						hideAllMoves();
+						moveTower(towerToMove, col, row);
+						model.sendMove(towerToMove, col, row);
+					});
+				}else {						//If white player, create circles
+					Circle possTower = new Circle(FIELD_SIZE * SCALEDOWN);
+					possTower.setFill(Color.TRANSPARENT);
+					possTower.setStroke(Color.rgb(200, 200, 200, 0.9));
+					possTower.setId("imaginary");
+					possTower.setStrokeWidth(STROKE_WIDTH);
+					gameBoard.add(possTower, col, row);
+					possTower.setOnMouseClicked((event) -> {
+						hideAllMoves();
+						moveTower(towerToMove, col, row);
+						model.sendMove(towerToMove, col, row);
+					});
+				}
 			}
 		});
 	}
 	
 	public void hideAllMoves() {
 		for (Node node : gameBoard.getChildren()) {
-			if(node instanceof Circle && node.getId().equals("imaginary")) {
-				Platform.runLater(new Runnable(){
-					@Override
-					public void run() {
-						Circle tower = (Circle) node;
-						gameBoard.getChildren().remove(tower);
-						}
-					});
+			if(node.getId() != null) {
+				if(node.getId().equals("imaginary")) {
+					Platform.runLater(new Runnable(){
+						@Override
+						public void run() {
+							gameBoard.getChildren().remove(node);
+							}
+						});
+				}
 			}
 		}
 	}
@@ -188,22 +213,22 @@ public class ClientView {
 	}
 
 	public void activateTowers(char playerCol) {
-		Circle tower;
 		for (Node node : gameBoard.getChildren()) {
-			if(node instanceof Circle && node.getId().charAt(0) == playerCol) {
-				tower = (Circle) node;
-				String towerID = tower.getId();
-				int col = gameBoard.getColumnIndex(tower);
-				int row = gameBoard.getRowIndex(tower);
-				tower.setOnMouseEntered((event)->{
-					activateFirstMoveFields(towerID, col, row);
-				});
-				tower.setOnMouseExited((event)->{
-					hideAllMoves();
-				});
-				tower.setOnMouseClicked((e)->{
-					deActivateTowers(playerCol);
-				});
+			if(node.getId() != null) {
+				if(node.getId().charAt(0) == playerCol) {
+					String towerID = node.getId();
+					int col = GridPane.getColumnIndex(node);
+					int row = GridPane.getRowIndex(node);
+					node.setOnMouseEntered((event)->{
+						activateFirstMoveFields(towerID, col, row);
+					});
+					node.setOnMouseExited((event)->{
+						hideAllMoves();
+					});
+					node.setOnMouseClicked((e)->{
+						deActivateTowers(playerCol);
+					});
+				}
 			}
 		}
 	}
@@ -211,10 +236,11 @@ public class ClientView {
 	public void deActivateTowers(char playerCol) {
 		Circle tower;
 		for (Node node : gameBoard.getChildren()) {
-			if(node instanceof Circle && node.getId().charAt(0) == playerCol) {
-				tower = (Circle) node;
-				tower.setOnMouseEntered(null);
-				tower.setOnMouseExited(null);
+			if(node.getId() != null) {
+				if(node.getId().charAt(0) == playerCol) {
+					node.setOnMouseEntered(null);
+					node.setOnMouseExited(null);
+				}
 			}
 		}
 	}
@@ -223,7 +249,7 @@ public class ClientView {
 		int col; int row;
 		
 		col = towerCol;
-		row= towerRow;
+		row = towerRow;
 		//activate left diagonal
 		while(col >= 0  && row > 0 && col <= 7 && row <= 7) {
 			col--; row--;
@@ -233,7 +259,7 @@ public class ClientView {
 		}
 		
 		col = towerCol;
-		row= towerRow;
+		row = towerRow;
 		//activate right diagonal
 		while(col >= 0  && row > 0 && col <= 7 && row <= 7) {
 			col++; row--;
@@ -243,7 +269,7 @@ public class ClientView {
 		}
 		
 		col = towerCol;
-		row= towerRow;
+		row = towerRow;
 		//activate horizontal
 		while(col >= 0  && row > 0 && col <= 7 && row <= 7) {
 			row--;
@@ -260,16 +286,29 @@ public class ClientView {
 			public void run() {				
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Kamisado by ShortyNBaldy - Client");
-				if(won) {
-					alert.setHeaderText("You Won!");
-					if(reason.equals("surrender")) {
-						alert.setContentText("Your opponent gave up.");
-					}else {
-						alert.setContentText("Congratulations, you reached your opponent's baseline!");
-					}
+				alert.setHeaderText("");
+				if(reason.equals("deadlock")) {
+					ImageView loser = new ImageView(new Image (getClass().getResourceAsStream("sad_minion.jpg")));
+					alert.setGraphic(loser);
+					alert.setContentText("You guys are both blocked.. That's a deadlock.");
 				}else {
-					alert.setHeaderText("Sorry, you lost..");
-					alert.setContentText("Your opponent reached your baseline.");
+					if(won) {
+						ImageView winner = new ImageView(new Image (getClass().getResourceAsStream("minions.jpg")));
+						alert.setGraphic(winner);
+						if(reason.equals("surrender")) {
+							alert.setContentText("You WON! Your opponent gave up.");
+						}else {
+							alert.setContentText("You WON! You reached the other side!");
+						}
+					}else {
+						ImageView loser = new ImageView(new Image (getClass().getResourceAsStream("sad_minion.jpg")));
+						alert.setGraphic(loser);
+						if(reason.equals("surrender")) {
+							alert.setContentText("You gave up...");
+						}else {
+							alert.setContentText("Sorry, you lost. Your opponent reached your baseline..");
+						}
+					}
 				}
 				alert.showAndWait();
 			}
@@ -290,12 +329,30 @@ public class ClientView {
 		});	
 	}
 	
+	public void giveUp() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Kamisado by ShortyNBaldy - Client");
+		alert.setHeaderText("You are about to give up.");
+		alert.setContentText("Are you sure?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+		    model.surrender();
+		}
+	}
+	
 	public void start() {
 		stage.show();
 	}
 
 	public void stop() {
-		model.sendLeave();
+		//inform server
+		if(model.serverSocket.isConnected()) {model.sendLeave();}
+		
+		//end thread
+		model.running = false;
+		
+		//exit
 		Platform.exit();
 	}
 
@@ -305,89 +362,121 @@ public class ClientView {
 	
 	private void createTowers() {
 		// create black towers and set them to the initial position
-
-		Circle bOrange = new Circle(FIELD_SIZE * SCALEDOWN);
+		
+		Rectangle bOrange = new Rectangle();
 		bOrange.setFill(Color.ORANGE);
 		bOrange.setStroke(Color.BLACK);
 		bOrange.setStrokeWidth(STROKE_WIDTH);
 		bOrange.setId("BORANGE");
+		bOrange.setWidth(40);
+		bOrange.setHeight(40);
+		bOrange.getTransforms().add(new Rotate(45,bOrange.getWidth()/2,(bOrange.getHeight()/2)));
+		GridPane.setHalignment(bOrange, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(bOrange, 7, 7);
 		}else {
 			gameBoard.add(bOrange, 0, 0);
 		}
-
-		Circle bBlue = new Circle(FIELD_SIZE * SCALEDOWN);
+		
+		Rectangle bBlue = new Rectangle();
 		bBlue.setFill(Color.BLUE);
 		bBlue.setStroke(Color.BLACK);
 		bBlue.setStrokeWidth(STROKE_WIDTH);
 		bBlue.setId("BBLUE");
+		bBlue.setWidth(40);
+		bBlue.setHeight(40);
+		bBlue.getTransforms().add(new Rotate(45,bBlue.getWidth()/2,(bBlue.getHeight()/2)));
+		GridPane.setHalignment(bBlue, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(bBlue, 6, 7);
 		}else {
 			gameBoard.add(bBlue, 1, 0);
 		}
 
-		Circle bPurple = new Circle(FIELD_SIZE * SCALEDOWN);
+		Rectangle bPurple = new Rectangle();
 		bPurple.setFill(Color.PURPLE);
 		bPurple.setStroke(Color.BLACK);
 		bPurple.setStrokeWidth(STROKE_WIDTH);
 		bPurple.setId("BPURPLE");
+		bPurple.setWidth(40);
+		bPurple.setHeight(40);
+		bPurple.getTransforms().add(new Rotate(45,bPurple.getWidth()/2,(bPurple.getHeight()/2)));
+		GridPane.setHalignment(bPurple, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(bPurple, 5, 7);
 		}else {
 			gameBoard.add(bPurple, 2, 0);
 		}
 
-		Circle bPink = new Circle(FIELD_SIZE * SCALEDOWN);
+		Rectangle bPink = new Rectangle();
 		bPink.setFill(Color.PINK);
 		bPink.setStroke(Color.BLACK);
 		bPink.setStrokeWidth(STROKE_WIDTH);
 		bPink.setId("BPINK");
+		bPink.setWidth(40);
+		bPink.setHeight(40);
+		bPink.getTransforms().add(new Rotate(45,bPink.getWidth()/2,(bPink.getHeight()/2)));
+		GridPane.setHalignment(bPink, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(bPink, 4, 7);
 		}else {
 			gameBoard.add(bPink, 3, 0);
 		}
 
-		Circle bYellow = new Circle(FIELD_SIZE * SCALEDOWN);
-		bYellow.setFill(Color.GOLD);
+		Rectangle bYellow = new Rectangle();
+		bYellow.setFill(Color.YELLOW);
 		bYellow.setStroke(Color.BLACK);
 		bYellow.setStrokeWidth(STROKE_WIDTH);
 		bYellow.setId("BYELLOW");
+		bYellow.setWidth(40);
+		bYellow.setHeight(40);
+		bYellow.getTransforms().add(new Rotate(45,bYellow.getWidth()/2,(bYellow.getHeight()/2)));
+		GridPane.setHalignment(bYellow, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(bYellow, 3, 7);
 		}else {
 			gameBoard.add(bYellow, 4, 0);
 		}
 
-		Circle bRed = new Circle(FIELD_SIZE * SCALEDOWN);
+		Rectangle bRed = new Rectangle();
 		bRed.setFill(Color.RED);
 		bRed.setStroke(Color.BLACK);
 		bRed.setStrokeWidth(STROKE_WIDTH);
 		bRed.setId("BRED");
+		bRed.setWidth(40);
+		bRed.setHeight(40);
+		bRed.getTransforms().add(new Rotate(45,bRed.getWidth()/2,(bRed.getHeight()/2)));
+		GridPane.setHalignment(bRed, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(bRed, 2, 7);
 		}else {
 			gameBoard.add(bRed, 5, 0);
 		}
 
-		Circle bGreen = new Circle(FIELD_SIZE * SCALEDOWN);
+		Rectangle bGreen = new Rectangle();
 		bGreen.setFill(Color.GREEN);
 		bGreen.setStroke(Color.BLACK);
 		bGreen.setStrokeWidth(STROKE_WIDTH);
 		bGreen.setId("BGREEN");
+		bGreen.setWidth(40);
+		bGreen.setHeight(40);
+		bGreen.getTransforms().add(new Rotate(45,bGreen.getWidth()/2,(bGreen.getHeight()/2)));
+		GridPane.setHalignment(bGreen, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(bGreen, 1, 7);
 		}else {
 			gameBoard.add(bGreen, 6, 0);
 		}
 
-		Circle bBrown = new Circle(FIELD_SIZE * SCALEDOWN);
+		Rectangle bBrown = new Rectangle();
 		bBrown.setFill(Color.BROWN);
 		bBrown.setStroke(Color.BLACK);
 		bBrown.setStrokeWidth(STROKE_WIDTH);
 		bBrown.setId("BBROWN");
+		bBrown.setWidth(40);
+		bBrown.setHeight(40);
+		bBrown.getTransforms().add(new Rotate(45,bBrown.getWidth()/2,(bBrown.getHeight()/2)));
+		GridPane.setHalignment(bBrown, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(bBrown, 0, 7);
 		}else {
@@ -397,7 +486,7 @@ public class ClientView {
 		// create white towers and set them to the initial position
 		Circle wOrange = new Circle(FIELD_SIZE * SCALEDOWN);
 		wOrange.setFill(Color.ORANGE);
-		wOrange.setStroke(Color.WHITE);
+		wOrange.setStroke(Color.BLACK);
 		wOrange.setStrokeWidth(STROKE_WIDTH);
 		wOrange.setId("WORANGE");
 		if(model.black) {
@@ -408,7 +497,7 @@ public class ClientView {
 
 		Circle wBlue = new Circle(FIELD_SIZE * SCALEDOWN);
 		wBlue.setFill(Color.BLUE);
-		wBlue.setStroke(Color.WHITE);
+		wBlue.setStroke(Color.BLACK);
 		wBlue.setStrokeWidth(STROKE_WIDTH);
 		wBlue.setId("WBLUE");
 		if(model.black) {
@@ -419,7 +508,7 @@ public class ClientView {
 
 		Circle wPurple = new Circle(FIELD_SIZE * SCALEDOWN);
 		wPurple.setFill(Color.PURPLE);
-		wPurple.setStroke(Color.WHITE);
+		wPurple.setStroke(Color.BLACK);
 		wPurple.setStrokeWidth(STROKE_WIDTH);
 		wPurple.setId("WPURPLE");
 		if(model.black) {
@@ -430,7 +519,7 @@ public class ClientView {
 
 		Circle wPink = new Circle(FIELD_SIZE * SCALEDOWN);
 		wPink.setFill(Color.PINK);
-		wPink.setStroke(Color.WHITE);
+		wPink.setStroke(Color.BLACK);
 		wPink.setStrokeWidth(STROKE_WIDTH);
 		wPink.setId("WPINK");
 		if(model.black) {
@@ -440,8 +529,8 @@ public class ClientView {
 		}
 
 		Circle wYellow = new Circle(FIELD_SIZE * SCALEDOWN);
-		wYellow.setFill(Color.GOLD);
-		wYellow.setStroke(Color.WHITE);
+		wYellow.setFill(Color.YELLOW);
+		wYellow.setStroke(Color.BLACK);
 		wYellow.setStrokeWidth(STROKE_WIDTH);
 		wYellow.setId("WYELLOW");
 		if(model.black) {
@@ -452,7 +541,7 @@ public class ClientView {
 
 		Circle wRed = new Circle(FIELD_SIZE * SCALEDOWN);
 		wRed.setFill(Color.RED);
-		wRed.setStroke(Color.WHITE);
+		wRed.setStroke(Color.BLACK);
 		wRed.setStrokeWidth(STROKE_WIDTH);
 		wRed.setId("WRED");
 		if(model.black) {
@@ -463,7 +552,7 @@ public class ClientView {
 
 		Circle wGreen = new Circle(FIELD_SIZE * SCALEDOWN);
 		wGreen.setFill(Color.GREEN);
-		wGreen.setStroke(Color.WHITE);
+		wGreen.setStroke(Color.BLACK);
 		wGreen.setStrokeWidth(STROKE_WIDTH);
 		wGreen.setId("WGREEN");
 		if(model.black) {
@@ -474,7 +563,7 @@ public class ClientView {
 
 		Circle wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
 		wBrown.setFill(Color.BROWN);
-		wBrown.setStroke(Color.WHITE);
+		wBrown.setStroke(Color.BLACK);
 		wBrown.setStrokeWidth(STROKE_WIDTH);
 		wBrown.setId("WBROWN");
 		if(model.black) {
@@ -512,7 +601,7 @@ public class ClientView {
 		Rectangle e = new Rectangle();
 		e.setWidth(FIELD_SIZE);
 		e.setHeight(FIELD_SIZE);
-		e.setFill(Color.GOLD);
+		e.setFill(Color.YELLOW);
 		gameBoard.add(e, 4, 0);
 
 		Rectangle f = new Rectangle();
@@ -567,7 +656,7 @@ public class ClientView {
 		Rectangle n = new Rectangle();
 		n.setWidth(FIELD_SIZE);
 		n.setHeight(FIELD_SIZE);
-		n.setFill(Color.GOLD);
+		n.setFill(Color.YELLOW);
 		gameBoard.add(n, 5, 1);
 
 		Rectangle o = new Rectangle();
@@ -622,7 +711,7 @@ public class ClientView {
 		Rectangle x = new Rectangle();
 		x.setWidth(FIELD_SIZE);
 		x.setHeight(FIELD_SIZE);
-		x.setFill(Color.GOLD);
+		x.setFill(Color.YELLOW);
 		gameBoard.add(x, 6, 2);
 
 		Rectangle y = new Rectangle();
@@ -678,7 +767,7 @@ public class ClientView {
 		Rectangle hh = new Rectangle();
 		hh.setWidth(FIELD_SIZE);
 		hh.setHeight(FIELD_SIZE);
-		hh.setFill(Color.GOLD);
+		hh.setFill(Color.YELLOW);
 		gameBoard.add(hh, 7, 3);
 
 		// eight row
@@ -709,7 +798,7 @@ public class ClientView {
 		Rectangle mm = new Rectangle();
 		mm.setWidth(FIELD_SIZE);
 		mm.setHeight(FIELD_SIZE);
-		mm.setFill(Color.GOLD);
+		mm.setFill(Color.YELLOW);
 		gameBoard.add(mm, 3, 7);
 
 		Rectangle nn = new Rectangle();
@@ -764,7 +853,7 @@ public class ClientView {
 		Rectangle vv = new Rectangle();
 		vv.setWidth(FIELD_SIZE);
 		vv.setHeight(FIELD_SIZE);
-		vv.setFill(Color.GOLD);
+		vv.setFill(Color.YELLOW);
 		gameBoard.add(vv, 2, 6);
 
 		Rectangle ww = new Rectangle();
@@ -819,7 +908,7 @@ public class ClientView {
 		Rectangle ggg = new Rectangle();
 		ggg.setWidth(FIELD_SIZE);
 		ggg.setHeight(FIELD_SIZE);
-		ggg.setFill(Color.GOLD);
+		ggg.setFill(Color.YELLOW);
 		gameBoard.add(ggg, 1, 5);
 
 		Rectangle hhh = new Rectangle();
@@ -875,7 +964,7 @@ public class ClientView {
 		Rectangle ppp = new Rectangle();
 		ppp.setWidth(FIELD_SIZE);
 		ppp.setHeight(FIELD_SIZE);
-		ppp.setFill(Color.GOLD);
+		ppp.setFill(Color.YELLOW);
 		gameBoard.add(ppp, 0, 4);
 	}
 

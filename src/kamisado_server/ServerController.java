@@ -1,5 +1,6 @@
 package kamisado_server;
 
+import java.util.Random;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -38,9 +39,9 @@ public class ServerController{
 				break;	
 	        case "move":			processMove(json, plColor);
 	        	break;
-	        case "end":				processEnd(json, plColor);// can only be surrendering
+	        case "end":				processEnd(json, plColor);	// can only be surrendering
         		break;
-	        case "leave":			processLeave(plColor);
+	        case "leave":			processLeave();				//doesn't need any inputs
     			break;
 	        default: 				logger.warning("Invalid Type");
 		}
@@ -80,64 +81,96 @@ public class ServerController{
 		int newXPos = x.intValue();
 		int newYPos = y.intValue();
 		
-		String playerName = plColor == 'B' ? model.namePlB : model.namePlW;
-		model.newMsgGui.set(playerName + " has moved " + movedTwrStr + " to " + newXPos + " " + newYPos);
-		
-		model.moveTower(movedTwr, newXPos, newYPos);
-		FieldColor landedFieldCol = model.getFieldColor(newXPos, newYPos);
-		TowerColor nextTwr = TowerColor.valueOf(nextPlayer + landedFieldCol.toString());
-		
-		JSONArray possibleMoves = model.getPossibleMoves(nextTwr);
-		
-		if(possibleMoves.isEmpty()) {	//Player is blocked
-			//Inform Players
-			String nameBlockedPl = plColor == 'B' ? model.namePlB : model.namePlW;
-			JSONObject newJSON = new JSONObject();
-			newJSON.put("type", "chat");
-			newJSON.put("msg", nameBlockedPl + " is blocked!");
-			model.send(newJSON.toString(), 'B');
-			model.send(newJSON.toString(), 'W');
-			
-			//Update move on blocked Players Gameboard
-			newJSON = new JSONObject();
-			newJSON.put("type", "requestMove");
-			newJSON.put("movedTower", movedTwrStr);
-			newJSON.put("xPos", newXPos);
-			newJSON.put("yPos", newYPos);
-			newJSON.put("opponentBlocked", false);
-			newJSON.put("playerBlocked", true);
-			model.send(newJSON.toString(), nextPlayer);
-			
-			
-			//Ask same Player for another move
-			newJSON = new JSONObject();
-			newJSON.put("type", "requestMove");
-			Integer[] blockedTwrPos = model.getTowerPos(nextTwr);
-			FieldColor blockedTwrFieldCol = model.getFieldColor(blockedTwrPos[0], blockedTwrPos[1]);
-			nextTwr = TowerColor.valueOf(plColor + blockedTwrFieldCol.toString());
-			newJSON.put("nextTower", nextTwr.toString());
-			newJSON.put("possibleMoves", model.getPossibleMoves(nextTwr));
-			newJSON.put("opponentBlocked", true);
-			newJSON.put("playerBlocked", false);
-			model.send(newJSON.toString(), plColor); //This message goes back to same player
-			
-		}else {							//Nobody blocked
-			JSONObject newJSON = new JSONObject();
-			newJSON.put("type", "requestMove");
-			newJSON.put("movedTower", movedTwrStr);
-			newJSON.put("xPos", newXPos);
-			newJSON.put("yPos", newYPos);
-			newJSON.put("nextTower", nextTwr.toString());
-			newJSON.put("possibleMoves", possibleMoves);
-			newJSON.put("opponentBlocked", false);
-			newJSON.put("playerBlocked", false);
-			model.send(newJSON.toString(), nextPlayer);
-		}
-		
-		//Check if somebody won
-		if(newYPos == 0 || newYPos == 7) {
+		if(newYPos == 0 || newYPos == 7) {	//Somebody Won, no need to calculate next moves
 			plrWon(plColor);
+		}else {								//Nobody won yet, go on
+			String playerName = plColor == 'B' ? model.namePlB : model.namePlW;
+			model.newMsgGui.set(playerName + " has moved " + movedTwrStr + " to " + newXPos + " " + newYPos);
+			
+			model.moveTower(movedTwr, newXPos, newYPos);
+			FieldColor landedFieldCol = model.getFieldColor(newXPos, newYPos);
+			TowerColor nextTwr = TowerColor.valueOf(nextPlayer + landedFieldCol.toString());
+			
+			JSONArray possibleMoves = model.getPossibleMoves(nextTwr);
+			
+			if(possibleMoves.isEmpty() && model.lastPlayerBlocked) {	//current and previous player are blocked ---> deadlock
+				deadlock();
+			}else if(possibleMoves.isEmpty()) {	//Player is blocked
+				model.lastPlayerBlocked = true;
+				//Inform Players
+				String nameBlockedPl = plColor == 'B' ? model.namePlW : model.namePlB;
+				JSONObject newJSON = new JSONObject();
+				newJSON.put("type", "chat");
+				newJSON.put("msg", nameBlockedPl + " is blocked!");
+				model.send(newJSON.toString(), 'B');
+				model.send(newJSON.toString(), 'W');
+				
+				//Update move on blocked Players Gameboard
+				newJSON = new JSONObject();
+				newJSON.put("type", "requestMove");
+				newJSON.put("movedTower", movedTwrStr);
+				newJSON.put("xPos", newXPos);
+				newJSON.put("yPos", newYPos);
+				newJSON.put("opponentBlocked", false);
+				newJSON.put("playerBlocked", true);
+				model.send(newJSON.toString(), nextPlayer);
+				
+				
+				//Ask same Player for another move
+				newJSON = new JSONObject();
+				newJSON.put("type", "requestMove");
+				Integer[] blockedTwrPos = model.getTowerPos(nextTwr);
+				FieldColor blockedTwrFieldCol = model.getFieldColor(blockedTwrPos[0], blockedTwrPos[1]);
+				nextTwr = TowerColor.valueOf(plColor + blockedTwrFieldCol.toString());
+				newJSON.put("nextTower", nextTwr.toString());
+				newJSON.put("possibleMoves", model.getPossibleMoves(nextTwr));
+				newJSON.put("opponentBlocked", true);
+				newJSON.put("playerBlocked", false);
+				model.send(newJSON.toString(), plColor); //This message goes back to same player
+				
+			}else {							//Nobody blocked
+				model.lastPlayerBlocked = false;
+				
+				JSONObject newJSON = new JSONObject();
+				newJSON.put("type", "requestMove");
+				newJSON.put("movedTower", movedTwrStr);
+				newJSON.put("xPos", newXPos);
+				newJSON.put("yPos", newYPos);
+				newJSON.put("nextTower", nextTwr.toString());
+				newJSON.put("possibleMoves", possibleMoves);
+				newJSON.put("opponentBlocked", false);
+				newJSON.put("playerBlocked", false);
+				model.send(newJSON.toString(), nextPlayer);
+			}
 		}
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void deadlock() {
+		JSONObject json_deadlock = new JSONObject();
+		json_deadlock.put("type", "end");
+		json_deadlock.put("won", false);
+		json_deadlock.put("reason", "deadlock");
+		
+		model.send(json_deadlock.toString(), 'B');
+		model.send(json_deadlock.toString(), 'W');
+		
+		//Wait for 5seconds before restart
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		Random random = new Random(); //from: https://stackoverflow.com/questions/8878015/return-true-or-false-randomly
+		char firstMove;
+		if(random.nextBoolean()) {
+			firstMove = 'W';
+		}else {
+			firstMove = 'B';
+		}
+		model.initGame(firstMove); //Start game by sending initialization messages to both clients
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -156,13 +189,21 @@ public class ServerController{
 		if(surrenderer == 'B') { 	//Black Player won
 			winnerCol = 'W';
 			model.scoreW ++;
-		}else {					//White Player won
+		}else {						//White Player won
 			winnerCol = 'B';
 			model.scoreB ++;
 		}
 		
 		model.send(json_winner.toString(), winnerCol);
 		model.send(json_loser.toString(), surrenderer);
+		
+		//Wait for 5seconds before restart
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		model.initGame(surrenderer);
 	}
@@ -191,21 +232,28 @@ public class ServerController{
 		model.send(json_winner.toString(), winnerCol);
 		model.send(json_loser.toString(), looserCol);
 		
+		//Wait for 5seconds before restart
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		model.initGame(looserCol);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void processLeave(char plColor) {
-		char playerStillThere = plColor == 'B' ? 'W' : 'B';
-		JSONObject json = new JSONObject();
-		json.put("type", "leave");
-		model.send(json.toString(), playerStillThere);
+	private void processLeave() {
+		//Update GUI
 		model.newMsgGui.set("One of the Players left and the game got aborted." + br + "The server application will close in 10 secs.");
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+		//Stop View
 		view.stop();
 	}
 	

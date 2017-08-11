@@ -48,7 +48,7 @@ public class ConnectGUI {
 		grid.add(connected, 3, 1);
 		
 		grid.setHgap(10);
-		grid.setVgap(10);
+		grid.setVgap(15);
 		grid.setPadding(new Insets(20,10,10,150));
 		
 		root.setCenter(grid);
