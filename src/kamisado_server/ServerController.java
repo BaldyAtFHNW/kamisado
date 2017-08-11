@@ -173,7 +173,7 @@ public class ServerController{
 		}else {
 			firstMove = 'B';
 		}
-		model.initGame(firstMove); //Start game by sending initialization messages to both clients
+		model.restartGame(firstMove); //Start game by sending initialization messages to both clients
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -246,7 +246,6 @@ public class ServerController{
 		model.restartGame(looserCol);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void processLeave() {
 		//Update GUI
 		model.newMsgGui.set("One of the Players left and the game got aborted." + br + "The server application will close in 10 secs.");

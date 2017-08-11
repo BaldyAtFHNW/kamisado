@@ -303,29 +303,38 @@ public class ClientView {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Kamisado by ShortyNBaldy - Client");
 				alert.setHeaderText("");
-				if(reason.equals("deadlock")) {
+				if(won) {
+					ImageView winner = new ImageView(new Image (getClass().getResourceAsStream("minions.jpg")));
+					alert.setGraphic(winner);
+					if(reason.equals("surrender")) {
+						alert.setContentText("You WON! Your opponent gave up.");
+					}else {
+						alert.setContentText("You WON! You reached the other side!");
+					}
+				}else {
 					ImageView loser = new ImageView(new Image (getClass().getResourceAsStream("sad_minion.jpg")));
 					alert.setGraphic(loser);
-					alert.setContentText("You guys are both blocked.. That's a deadlock.");
-				}else {
-					if(won) {
-						ImageView winner = new ImageView(new Image (getClass().getResourceAsStream("minions.jpg")));
-						alert.setGraphic(winner);
-						if(reason.equals("surrender")) {
-							alert.setContentText("You WON! Your opponent gave up.");
-						}else {
-							alert.setContentText("You WON! You reached the other side!");
-						}
+					if(reason.equals("surrender")) {
+						alert.setContentText("You gave up...");
 					}else {
-						ImageView loser = new ImageView(new Image (getClass().getResourceAsStream("sad_minion.jpg")));
-						alert.setGraphic(loser);
-						if(reason.equals("surrender")) {
-							alert.setContentText("You gave up...");
-						}else {
-							alert.setContentText("Sorry, you lost. Your opponent reached your baseline..");
-						}
+						alert.setContentText("Sorry, you lost. Your opponent reached your baseline..");
 					}
 				}
+				alert.showAndWait();
+			}
+		});
+	}
+	
+	public void showDeadlock() {
+		Platform.runLater(new Runnable(){
+			@Override
+			public void run() {				
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Kamisado by ShortyNBaldy - Client");
+				alert.setHeaderText("");
+				ImageView loser = new ImageView(new Image (getClass().getResourceAsStream("sad_minion.jpg")));
+				alert.setGraphic(loser);
+				alert.setContentText("You guys are both blocked.. That's a deadlock.");
 				alert.showAndWait();
 			}
 		});

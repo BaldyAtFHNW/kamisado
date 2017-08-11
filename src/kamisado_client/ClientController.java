@@ -162,12 +162,17 @@ public class ClientController {
 		boolean won = (boolean) json.get("won");
 		String reason = (String) json.get("reason");
 		logger.info("Process End - Reason = " + reason);
-		if(won) {
-			view.lastMoves.appendText("You WON!");
+		if(reason.equals("deadlock")) {
+			view.lastMoves.appendText("Deadlock...." + br);
+			view.showDeadlock();
 		}else {
-			view.lastMoves.appendText("You lost..");
+			if(won) {
+				view.lastMoves.appendText("You WON!");
+			}else {
+				view.lastMoves.appendText("You lost..");
+			}
+			view.showEnd(won, reason);
 		}
-		view.showEnd(won, reason);
 	}
 	
 	private void processRestart(JSONObject json) {
