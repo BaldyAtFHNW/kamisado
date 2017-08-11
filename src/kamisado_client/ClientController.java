@@ -46,6 +46,8 @@ public class ClientController {
 	        	break;
 	        case "end":				processEnd(json);
 	    		break;
+	        case "restart":			processRestart(json);
+    			break;
 	        case "leave":			processLeave();
     			break;
 	        default: 				logger.warning("Invalid Type");
@@ -54,10 +56,8 @@ public class ClientController {
 	
 	private void processInit(JSONObject json) {
 		model.black = (boolean) json.get("black");
-		model.start = (boolean) json.get("start");
-		model.opponent = (String) json.get("opponent");
-		Long playerScore = (long) json.get("score");
-		Long opponentScore = (long) json.get("op_score");
+		model.opponentName = (String) json.get("opponent");
+		Boolean start = (boolean) json.get("start");
 		
 		view.initGame();
 		
@@ -71,19 +71,19 @@ public class ClientController {
 		Platform.runLater(new Runnable(){
 			@Override
 			public void run() {
-				view.playerScore.setText(playerScore.toString());
-				view.opponentScore.setText(opponentScore.toString());
+				view.playerScore.setText("0");
+				view.opponentScore.setText("0");
 				view.opponentName.setText((String) json.get("opponent"));
 			}
 		});
 		
-		view.lastMoves.appendText("You are playing against " + model.opponent + br);
+		view.lastMoves.appendText("You are playing against " + model.opponentName + br);
 		if(model.black) {
-			view.lastMoves.appendText("You are in charge of the Black Towers" + br);
+			view.lastMoves.appendText("You are in charge of the Diamonds" + br);
 		}else {
-			view.lastMoves.appendText("You are in charge of the White Towers" + br);
+			view.lastMoves.appendText("You are in charge of the Circles" + br);
 		}
-		if(model.start) {
+		if(start) {
 			view.firstMove();
 			view.lastMoves.appendText("You have the first Move" + br);
 		}
@@ -114,7 +114,10 @@ public class ClientController {
 	
 	private void processRequestMove(JSONObject json){
 		boolean opponentBlocked = (boolean) json.get("opponentBlocked");
-		boolean playerBlocked = (boolean) json.get("playerBlocked");		
+		boolean playerBlocked = (boolean) json.get("playerBlocked");
+		
+		if(playerBlocked) {view.lastMoves.appendText("You are blocked.." + br);}
+		if(opponentBlocked) {view.lastMoves.appendText(model.opponentName + " is blocked!" + br);}
 		
 		//Display Opponent's move
 		if(!opponentBlocked) { 			//Only if other player was not blocked
@@ -130,7 +133,7 @@ public class ClientController {
 				newYPos = model.turnUpsideDown(newYPos);
 			}
 			view.moveTower(movedTower, newXPos, newYPos);
-		}else {System.out.println("Opponent blocked!!!");}
+		}
 		
 		//Display Possible Moves
 		if(!playerBlocked) {				//Only if this player himself is not blocked
@@ -165,6 +168,27 @@ public class ClientController {
 			view.lastMoves.appendText("You lost..");
 		}
 		view.showEnd(won, reason);
+	}
+	
+	private void processRestart(JSONObject json) {
+		Boolean start = (boolean) json.get("start");
+		Long playerScore = (long) json.get("score");
+		Long opponentScore = (long) json.get("op_score");
+		
+		Platform.runLater(new Runnable(){
+			@Override
+			public void run() {
+				view.playerScore.setText(playerScore.toString());
+				view.opponentScore.setText(opponentScore.toString());
+				
+				view.restart();
+				
+				if(start) {
+					view.firstMove();
+					view.lastMoves.appendText("You have the first Move" + br);
+				}
+			}
+		});
 	}
 	
 	private void processLeave() {

@@ -24,9 +24,8 @@ public class ClientModel {
 	protected SimpleStringProperty latestMove = new SimpleStringProperty();
 
 	final public String playerName;
+	public String opponentName;
 	public boolean black;
-	public boolean start;
-	public String opponent;
 	
 	String br = System.getProperty("line.separator");
 	

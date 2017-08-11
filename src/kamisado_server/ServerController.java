@@ -21,6 +21,7 @@ public class ServerController{
 		model.newMsgGui.addListener( (o, oldValue, newValue) -> view.info.appendText(newValue + "\n"));
 		view.startSrv.setOnAction((event)->{
 			model.connectClients();
+			view.startSrv.setDisable(true);
 		});
 		view.endSrv.setOnAction((event)->{
 			view.stop();
@@ -72,8 +73,8 @@ public class ServerController{
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void processMove(JSONObject json, char plColor){
-		char nextPlayer = plColor == 'B' ? 'W' : 'B';
+	private void processMove(JSONObject json, char currentPlayer){
+		char nextPlayer = currentPlayer == 'B' ? 'W' : 'B';
 		String movedTwrStr = (String) json.get("towerColor");
 		TowerColor movedTwr = TowerColor.valueOf(movedTwrStr);
 		Long x = (long) json.get("xPos");
@@ -82,28 +83,23 @@ public class ServerController{
 		int newYPos = y.intValue();
 		
 		if(newYPos == 0 || newYPos == 7) {	//Somebody Won, no need to calculate next moves
-			plrWon(plColor);
+			plrWon(currentPlayer);
 		}else {								//Nobody won yet, go on
-			String playerName = plColor == 'B' ? model.namePlB : model.namePlW;
+			String playerName = currentPlayer == 'B' ? model.namePlB : model.namePlW;
 			model.newMsgGui.set(playerName + " has moved " + movedTwrStr + " to " + newXPos + " " + newYPos);
-			
 			model.moveTower(movedTwr, newXPos, newYPos);
 			FieldColor landedFieldCol = model.getFieldColor(newXPos, newYPos);
 			TowerColor nextTwr = TowerColor.valueOf(nextPlayer + landedFieldCol.toString());
-			
 			JSONArray possibleMoves = model.getPossibleMoves(nextTwr);
 			
-			if(possibleMoves.isEmpty() && model.lastPlayerBlocked) {	//current and previous player are blocked ---> deadlock
-				deadlock();
-			}else if(possibleMoves.isEmpty()) {	//Player is blocked
-				model.lastPlayerBlocked = true;
-				//Inform Players
-				String nameBlockedPl = plColor == 'B' ? model.namePlW : model.namePlB;
-				JSONObject newJSON = new JSONObject();
-				newJSON.put("type", "chat");
-				newJSON.put("msg", nameBlockedPl + " is blocked!");
-				model.send(newJSON.toString(), 'B');
-				model.send(newJSON.toString(), 'W');
+			JSONObject newJSON = new JSONObject();				
+			if(possibleMoves.isEmpty()) {			//next player is blocked
+				//Update boolean for blocked player
+				if(currentPlayer == 'B') {
+					model.WPlBlocked = true;
+				}else {
+					model.BPlBlocked = true;
+				}
 				
 				//Update move on blocked Players Gameboard
 				newJSON = new JSONObject();
@@ -115,23 +111,30 @@ public class ServerController{
 				newJSON.put("playerBlocked", true);
 				model.send(newJSON.toString(), nextPlayer);
 				
+				if(model.BPlBlocked && model.WPlBlocked) {     //<----- Deadlock, do not ask for another move
+					deadlock();
+				}else {
+					//Ask same Player for another move
+					newJSON = new JSONObject();
+					newJSON.put("type", "requestMove");
+					Integer[] blockedTwrPos = model.getTowerPos(nextTwr);
+					FieldColor blockedTwrFieldCol = model.getFieldColor(blockedTwrPos[0], blockedTwrPos[1]);
+					nextTwr = TowerColor.valueOf(currentPlayer + blockedTwrFieldCol.toString());
+					newJSON.put("nextTower", nextTwr.toString());
+					newJSON.put("possibleMoves", model.getPossibleMoves(nextTwr));
+					newJSON.put("opponentBlocked", true);
+					newJSON.put("playerBlocked", false);
+					model.send(newJSON.toString(), currentPlayer); //This message goes back to same player
+				}
+			}else {	//Next player not blocked
+				//Update boolean for not blocked player
+				if(currentPlayer == 'B') {
+					model.WPlBlocked = false;
+				}else {
+					model.BPlBlocked = false;
+				}
 				
-				//Ask same Player for another move
 				newJSON = new JSONObject();
-				newJSON.put("type", "requestMove");
-				Integer[] blockedTwrPos = model.getTowerPos(nextTwr);
-				FieldColor blockedTwrFieldCol = model.getFieldColor(blockedTwrPos[0], blockedTwrPos[1]);
-				nextTwr = TowerColor.valueOf(plColor + blockedTwrFieldCol.toString());
-				newJSON.put("nextTower", nextTwr.toString());
-				newJSON.put("possibleMoves", model.getPossibleMoves(nextTwr));
-				newJSON.put("opponentBlocked", true);
-				newJSON.put("playerBlocked", false);
-				model.send(newJSON.toString(), plColor); //This message goes back to same player
-				
-			}else {							//Nobody blocked
-				model.lastPlayerBlocked = false;
-				
-				JSONObject newJSON = new JSONObject();
 				newJSON.put("type", "requestMove");
 				newJSON.put("movedTower", movedTwrStr);
 				newJSON.put("xPos", newXPos);
@@ -143,7 +146,7 @@ public class ServerController{
 				model.send(newJSON.toString(), nextPlayer);
 			}
 		}
-		
+		System.out.println("Diamond Player blocked: " + model.BPlBlocked + " " + "Circle Player blocked: " + model.WPlBlocked);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -240,7 +243,7 @@ public class ServerController{
 			e.printStackTrace();
 		}
 		
-		model.initGame(looserCol);
+		model.restartGame(looserCol);
 	}
 	
 	@SuppressWarnings("unchecked")

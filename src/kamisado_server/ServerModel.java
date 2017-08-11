@@ -36,9 +36,10 @@ public class ServerModel{
 	protected int scoreB = 0;
 	protected int scoreW = 0;
 	
-	protected SimpleStringProperty newMsgGui = new SimpleStringProperty();
+	protected boolean WPlBlocked = false;
+	protected boolean BPlBlocked = false;
 	
-	protected boolean lastPlayerBlocked = false;
+	protected SimpleStringProperty newMsgGui = new SimpleStringProperty();
 	
 	protected boolean running = true;
 	
@@ -116,6 +117,36 @@ public class ServerModel{
 			initPlayerBlack.put("start", false);
 			initPlayerWhite.put("start", true);
 			this.newMsgGui.set("Game started - White Player has got the first move");
+		}
+		
+		this.send(initPlayerBlack.toString(), 'B');
+		this.send(initPlayerWhite.toString(), 'W');
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void restartGame(char firstMove){
+		this.initGameBoard();
+		this.initTowers();
+		
+		JSONObject initPlayerBlack = new JSONObject();
+		initPlayerBlack.put("type", "restart");
+		initPlayerBlack.put("score", this.scoreB);
+		initPlayerBlack.put("op_score", this.scoreW);
+		
+		JSONObject initPlayerWhite = new JSONObject();
+		initPlayerWhite.put("type", "restart");
+		initPlayerWhite.put("score", this.scoreW);
+		initPlayerWhite.put("op_score", this.scoreB);
+		
+		//Set the first move
+		if(firstMove == 'B') {
+			initPlayerBlack.put("start", true);
+			initPlayerWhite.put("start", false);
+			this.newMsgGui.set("Game restarted - Black Player has got the first move");
+		}else {
+			initPlayerBlack.put("start", false);
+			initPlayerWhite.put("start", true);
+			this.newMsgGui.set("Game restarted - White Player has got the first move");
 		}
 		
 		this.send(initPlayerBlack.toString(), 'B');
@@ -251,7 +282,6 @@ public class ServerModel{
 	public void initTowers(){
 		
 		this.towerPositions = new TowerColor[boardSize][boardSize];
-		
 		//Set all positions to null
 		for(int x = 0; x < 8; x++) {
 			for(int y = 0; y < 8; y++) {

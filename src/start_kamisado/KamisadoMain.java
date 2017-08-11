@@ -59,15 +59,17 @@ public class KamisadoMain extends Application{
 			srvView.start();
 		} else if (result.get() == startClient) {
 			connectGUI = new ConnectGUI(primaryStage);
-			connectGUI.connect.setOnAction((event) -> {startKamisadoClient(primaryStage);});
+			connectGUI.connect.setOnAction((event) -> {startKamisadoClient(primaryStage);connectGUI.connect.setDisable(true);});
 			connectGUI.txtName.setOnKeyPressed((event)->{
 				if (event.getCode() == KeyCode.ENTER)  {
 					startKamisadoClient(primaryStage);
+					connectGUI.connect.setDisable(true);
 		        }
 			});
 			connectGUI.txtIP.setOnKeyPressed((event)->{
 				if (event.getCode() == KeyCode.ENTER)  {
 					startKamisadoClient(primaryStage);
+					connectGUI.connect.setDisable(true);
 		        }
 			});
 

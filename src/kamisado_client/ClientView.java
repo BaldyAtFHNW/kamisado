@@ -2,38 +2,27 @@ package kamisado_client;
 
 import java.util.Optional;
 import java.util.logging.Logger;
-import org.json.simple.JSONObject;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Glow;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
@@ -57,7 +46,8 @@ public class ClientView {
 	final int FIELD_SIZE = 70;
 	final int STROKE_WIDTH = 10;
 	final double HIGHLIGHT_WIDTH = 1.5;
-	final double SCALEDOWN = 0.42;
+	final double SCALEDOWNCIRCLES = 0.35;
+	final double SCALEDOWNDIAMONDS = 0.5;
 
 	String br = System.getProperty("line.separator");
 	
@@ -70,11 +60,17 @@ public class ClientView {
 		Platform.runLater(new Runnable(){
 			@Override
 			public void run() {
+				double txtAreaWidth = 380;
+				
 				HBox root = new HBox();
 				VBox right = new VBox();
 				gameBoard = new GridPane();
 				HBox chat = new HBox();
 				HBox topRight = new HBox();
+				
+				gameBoard.setStyle("-fx-background-color: black");
+				gameBoard.setHgap(2);
+				gameBoard.setVgap(2);
 				
 				GridPane scoreBoard = new GridPane();
 				Label scores = new Label("Scores");
@@ -96,23 +92,23 @@ public class ClientView {
 				
 				lastMoves = new TextArea();
 				lastMoves.setEditable(false);
-				lastMoves.setMaxSize(434, 120);
-				lastMoves.setMinSize(434, 100);
+				lastMoves.setMaxSize(txtAreaWidth, 120);
+				lastMoves.setMinSize(txtAreaWidth, 120);
 				
 				chatArea = new TextArea();
 				chatArea.setEditable(false);
-				chatArea.setMaxSize(434, 334);
-				chatArea.setMinSize(434, 334);
+				chatArea.setMaxSize(txtAreaWidth, 347);
+				chatArea.setMinSize(txtAreaWidth, 347);
 				
 				chatTxt = new TextField();
-				chatTxt.setMaxWidth(354);
-				chatTxt.setMinWidth(354);
+				chatTxt.setMaxWidth(300);
+				chatTxt.setMinWidth(300);
 				
 				chatBtn = new Button("Send");
 				chatBtn.setMaxWidth(80);
 				chatBtn.setMinWidth(80);
 				
-				giveUp.setTranslateX(280); 		//from: https://stackoverflow.com/questions/30641187/position-javafx-button-in-a-specific-location
+				giveUp.setTranslateX(220); 		//from: https://stackoverflow.com/questions/30641187/position-javafx-button-in-a-specific-location
 				giveUp.setTranslateY(45);
 				
 				topRight.getChildren().addAll(scoreBoard, giveUp);
@@ -123,14 +119,21 @@ public class ClientView {
 				createFields();
 				createTowers();
 
-				Scene scene = new Scene(root, 1000, 560);
+				//Scene scene = new Scene(root, 980, 574);
+				Scene scene = new Scene(root);
 				stage.setScene(scene);
-				stage.setWidth(1000);
+				stage.setWidth(961);
+				stage.setHeight(603);
 				stage.setTitle("Kamisado by ShortyNBaldy - Client");
 				stage.getIcons().add(new Image("/shortyNBaldy.png"));
 			}
 		});
 
+	}
+	
+	public void restart() {
+		hideAllTowers();
+		createTowers();
 	}
 
 	public void moveTower(String towerToMove, int col, int row) {
@@ -158,14 +161,14 @@ public class ClientView {
 			public void run() {		
 				if(model.black) {			//If black player, create rectangles
 					Rectangle possTower = new Rectangle();
-					possTower.setWidth(40);
-					possTower.setHeight(40);
+					possTower.setWidth(FIELD_SIZE * SCALEDOWNDIAMONDS);
+					possTower.setHeight(FIELD_SIZE * SCALEDOWNDIAMONDS);
 					possTower.getTransforms().add(new Rotate(45,possTower.getWidth()/2,(possTower.getHeight()/2)));
-					GridPane.setHalignment(possTower, HPos.CENTER);
 					possTower.setFill(Color.TRANSPARENT);
 					possTower.setStroke(Color.rgb(200, 200, 200, 0.9));
 					possTower.setId("imaginary");
 					possTower.setStrokeWidth(STROKE_WIDTH);
+					GridPane.setHalignment(possTower, HPos.CENTER);
 					gameBoard.add(possTower, col, row);
 					possTower.setOnMouseClicked((event) -> {
 						hideAllMoves();
@@ -173,11 +176,12 @@ public class ClientView {
 						model.sendMove(towerToMove, col, row);
 					});
 				}else {						//If white player, create circles
-					Circle possTower = new Circle(FIELD_SIZE * SCALEDOWN);
+					Circle possTower = new Circle(FIELD_SIZE * SCALEDOWNCIRCLES);
 					possTower.setFill(Color.TRANSPARENT);
 					possTower.setStroke(Color.rgb(200, 200, 200, 0.9));
 					possTower.setId("imaginary");
 					possTower.setStrokeWidth(STROKE_WIDTH);
+					GridPane.setHalignment(possTower, HPos.CENTER);
 					gameBoard.add(possTower, col, row);
 					possTower.setOnMouseClicked((event) -> {
 						hideAllMoves();
@@ -200,6 +204,19 @@ public class ClientView {
 							}
 						});
 				}
+			}
+		}
+	}
+	
+	public void hideAllTowers() {
+		for (Node node : gameBoard.getChildren()) {
+			if(node.getId() != null) {
+				Platform.runLater(new Runnable(){
+					@Override
+					public void run() {
+						gameBoard.getChildren().remove(node);
+						}
+					});
 			}
 		}
 	}
@@ -234,7 +251,6 @@ public class ClientView {
 	}
 	
 	public void deActivateTowers(char playerCol) {
-		Circle tower;
 		for (Node node : gameBoard.getChildren()) {
 			if(node.getId() != null) {
 				if(node.getId().charAt(0) == playerCol) {
@@ -368,8 +384,8 @@ public class ClientView {
 		bOrange.setStroke(Color.BLACK);
 		bOrange.setStrokeWidth(STROKE_WIDTH);
 		bOrange.setId("BORANGE");
-		bOrange.setWidth(40);
-		bOrange.setHeight(40);
+		bOrange.setWidth(FIELD_SIZE * SCALEDOWNDIAMONDS);
+		bOrange.setHeight(FIELD_SIZE * SCALEDOWNDIAMONDS);
 		bOrange.getTransforms().add(new Rotate(45,bOrange.getWidth()/2,(bOrange.getHeight()/2)));
 		GridPane.setHalignment(bOrange, HPos.CENTER);
 		if(model.black) {
@@ -383,8 +399,8 @@ public class ClientView {
 		bBlue.setStroke(Color.BLACK);
 		bBlue.setStrokeWidth(STROKE_WIDTH);
 		bBlue.setId("BBLUE");
-		bBlue.setWidth(40);
-		bBlue.setHeight(40);
+		bBlue.setWidth(FIELD_SIZE * SCALEDOWNDIAMONDS);
+		bBlue.setHeight(FIELD_SIZE * SCALEDOWNDIAMONDS);
 		bBlue.getTransforms().add(new Rotate(45,bBlue.getWidth()/2,(bBlue.getHeight()/2)));
 		GridPane.setHalignment(bBlue, HPos.CENTER);
 		if(model.black) {
@@ -398,8 +414,8 @@ public class ClientView {
 		bPurple.setStroke(Color.BLACK);
 		bPurple.setStrokeWidth(STROKE_WIDTH);
 		bPurple.setId("BPURPLE");
-		bPurple.setWidth(40);
-		bPurple.setHeight(40);
+		bPurple.setWidth(FIELD_SIZE * SCALEDOWNDIAMONDS);
+		bPurple.setHeight(FIELD_SIZE * SCALEDOWNDIAMONDS);
 		bPurple.getTransforms().add(new Rotate(45,bPurple.getWidth()/2,(bPurple.getHeight()/2)));
 		GridPane.setHalignment(bPurple, HPos.CENTER);
 		if(model.black) {
@@ -413,8 +429,8 @@ public class ClientView {
 		bPink.setStroke(Color.BLACK);
 		bPink.setStrokeWidth(STROKE_WIDTH);
 		bPink.setId("BPINK");
-		bPink.setWidth(40);
-		bPink.setHeight(40);
+		bPink.setWidth(FIELD_SIZE * SCALEDOWNDIAMONDS);
+		bPink.setHeight(FIELD_SIZE * SCALEDOWNDIAMONDS);
 		bPink.getTransforms().add(new Rotate(45,bPink.getWidth()/2,(bPink.getHeight()/2)));
 		GridPane.setHalignment(bPink, HPos.CENTER);
 		if(model.black) {
@@ -428,8 +444,8 @@ public class ClientView {
 		bYellow.setStroke(Color.BLACK);
 		bYellow.setStrokeWidth(STROKE_WIDTH);
 		bYellow.setId("BYELLOW");
-		bYellow.setWidth(40);
-		bYellow.setHeight(40);
+		bYellow.setWidth(FIELD_SIZE * SCALEDOWNDIAMONDS);
+		bYellow.setHeight(FIELD_SIZE * SCALEDOWNDIAMONDS);
 		bYellow.getTransforms().add(new Rotate(45,bYellow.getWidth()/2,(bYellow.getHeight()/2)));
 		GridPane.setHalignment(bYellow, HPos.CENTER);
 		if(model.black) {
@@ -443,8 +459,8 @@ public class ClientView {
 		bRed.setStroke(Color.BLACK);
 		bRed.setStrokeWidth(STROKE_WIDTH);
 		bRed.setId("BRED");
-		bRed.setWidth(40);
-		bRed.setHeight(40);
+		bRed.setWidth(FIELD_SIZE * SCALEDOWNDIAMONDS);
+		bRed.setHeight(FIELD_SIZE * SCALEDOWNDIAMONDS);
 		bRed.getTransforms().add(new Rotate(45,bRed.getWidth()/2,(bRed.getHeight()/2)));
 		GridPane.setHalignment(bRed, HPos.CENTER);
 		if(model.black) {
@@ -458,8 +474,8 @@ public class ClientView {
 		bGreen.setStroke(Color.BLACK);
 		bGreen.setStrokeWidth(STROKE_WIDTH);
 		bGreen.setId("BGREEN");
-		bGreen.setWidth(40);
-		bGreen.setHeight(40);
+		bGreen.setWidth(FIELD_SIZE * SCALEDOWNDIAMONDS);
+		bGreen.setHeight(FIELD_SIZE * SCALEDOWNDIAMONDS);
 		bGreen.getTransforms().add(new Rotate(45,bGreen.getWidth()/2,(bGreen.getHeight()/2)));
 		GridPane.setHalignment(bGreen, HPos.CENTER);
 		if(model.black) {
@@ -473,8 +489,8 @@ public class ClientView {
 		bBrown.setStroke(Color.BLACK);
 		bBrown.setStrokeWidth(STROKE_WIDTH);
 		bBrown.setId("BBROWN");
-		bBrown.setWidth(40);
-		bBrown.setHeight(40);
+		bBrown.setWidth(FIELD_SIZE * SCALEDOWNDIAMONDS);
+		bBrown.setHeight(FIELD_SIZE * SCALEDOWNDIAMONDS);
 		bBrown.getTransforms().add(new Rotate(45,bBrown.getWidth()/2,(bBrown.getHeight()/2)));
 		GridPane.setHalignment(bBrown, HPos.CENTER);
 		if(model.black) {
@@ -484,88 +500,96 @@ public class ClientView {
 		}
 
 		// create white towers and set them to the initial position
-		Circle wOrange = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wOrange = new Circle(FIELD_SIZE * SCALEDOWNCIRCLES);
 		wOrange.setFill(Color.ORANGE);
 		wOrange.setStroke(Color.BLACK);
 		wOrange.setStrokeWidth(STROKE_WIDTH);
 		wOrange.setId("WORANGE");
+		GridPane.setHalignment(wOrange, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(wOrange, 0, 0);
 		}else {
 			gameBoard.add(wOrange, 7, 7);
 		}
 
-		Circle wBlue = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wBlue = new Circle(FIELD_SIZE * SCALEDOWNCIRCLES);
 		wBlue.setFill(Color.BLUE);
 		wBlue.setStroke(Color.BLACK);
 		wBlue.setStrokeWidth(STROKE_WIDTH);
 		wBlue.setId("WBLUE");
+		GridPane.setHalignment(wBlue, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(wBlue, 1, 0);
 		}else {
 			gameBoard.add(wBlue, 6, 7);
 		}
 
-		Circle wPurple = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wPurple = new Circle(FIELD_SIZE * SCALEDOWNCIRCLES);
 		wPurple.setFill(Color.PURPLE);
 		wPurple.setStroke(Color.BLACK);
 		wPurple.setStrokeWidth(STROKE_WIDTH);
 		wPurple.setId("WPURPLE");
+		GridPane.setHalignment(wPurple, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(wPurple, 2, 0);
 		}else {
 			gameBoard.add(wPurple, 5, 7);
 		}
 
-		Circle wPink = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wPink = new Circle(FIELD_SIZE * SCALEDOWNCIRCLES);
 		wPink.setFill(Color.PINK);
 		wPink.setStroke(Color.BLACK);
 		wPink.setStrokeWidth(STROKE_WIDTH);
 		wPink.setId("WPINK");
+		GridPane.setHalignment(wPink, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(wPink, 3, 0);
 		}else {
 			gameBoard.add(wPink, 4, 7);
 		}
 
-		Circle wYellow = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wYellow = new Circle(FIELD_SIZE * SCALEDOWNCIRCLES);
 		wYellow.setFill(Color.YELLOW);
 		wYellow.setStroke(Color.BLACK);
 		wYellow.setStrokeWidth(STROKE_WIDTH);
 		wYellow.setId("WYELLOW");
+		GridPane.setHalignment(wYellow, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(wYellow, 4, 0);
 		}else {
 			gameBoard.add(wYellow, 3, 7);
 		}
 
-		Circle wRed = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wRed = new Circle(FIELD_SIZE * SCALEDOWNCIRCLES);
 		wRed.setFill(Color.RED);
 		wRed.setStroke(Color.BLACK);
 		wRed.setStrokeWidth(STROKE_WIDTH);
 		wRed.setId("WRED");
+		GridPane.setHalignment(wRed, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(wRed, 5, 0);
 		}else {
 			gameBoard.add(wRed, 2, 7);
 		}
 
-		Circle wGreen = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wGreen = new Circle(FIELD_SIZE * SCALEDOWNCIRCLES);
 		wGreen.setFill(Color.GREEN);
 		wGreen.setStroke(Color.BLACK);
 		wGreen.setStrokeWidth(STROKE_WIDTH);
 		wGreen.setId("WGREEN");
+		GridPane.setHalignment(wGreen, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(wGreen, 6, 0);
 		}else {
 			gameBoard.add(wGreen, 1, 7);
 		}
 
-		Circle wBrown = new Circle(FIELD_SIZE * SCALEDOWN);
+		Circle wBrown = new Circle(FIELD_SIZE * SCALEDOWNCIRCLES);
 		wBrown.setFill(Color.BROWN);
 		wBrown.setStroke(Color.BLACK);
 		wBrown.setStrokeWidth(STROKE_WIDTH);
 		wBrown.setId("WBROWN");
+		GridPane.setHalignment(wBrown, HPos.CENTER);
 		if(model.black) {
 			gameBoard.add(wBrown, 7, 0);
 		}else {
