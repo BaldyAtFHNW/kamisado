@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -35,8 +36,8 @@ public class ServerModel{
 	protected int scoreB = 0;
 	protected int scoreW = 0;
 	
-	protected boolean WPlBlocked = false;
-	protected boolean BPlBlocked = false;
+//	protected boolean WPlBlocked = false;
+//	protected boolean BPlBlocked = false;
 	
 	protected SimpleStringProperty newMsgGui = new SimpleStringProperty();
 	
@@ -86,6 +87,46 @@ public class ServerModel{
 			logger.warning(e.toString());
 			e.printStackTrace();
 		}
+	}
+	
+	private boolean towerIsBlocked(TowerColor tower) {
+		boolean blocked = false;
+		if (this.getPossibleMoves(tower).isEmpty()){
+			blocked = true;
+		}
+		return blocked;
+	}
+	
+	//returns next tower
+	private TowerColor getNextTower(int xPos, int yPos, char nextPlayer) {
+		FieldColor landedFieldCol = this.getFieldColor(xPos, yPos);
+		TowerColor nextTwr = TowerColor.valueOf(nextPlayer + landedFieldCol.toString());
+		return nextTwr;
+	}
+	
+	//returns next tower which is not blocked
+	public TowerColor getNextPlayableTower(int xPos, int yPos, char nextPlayer) {
+		TowerColor nextTower = getNextTower(xPos, yPos, nextPlayer);
+		ArrayList<String> blockedTowers = new ArrayList<String>();
+		while(towerIsBlocked(nextTower)) {
+			if(!blockedTowers.isEmpty()) {
+				for(String bt : blockedTowers) {
+					if(bt.equals(nextTower.toString())) {
+						return null;
+					}
+				}
+			}
+			
+			//Add new blocked tower to array
+			blockedTowers.add(nextTower.toString());
+			
+			//Get Next Tower
+			System.out.println("Tower " + nextTower.toString() + " is blocked");
+			Integer[] nxtTwrPos = this.getTowerPos(nextTower);
+			if(nextPlayer == 'B') {nextPlayer = 'W';}else {nextPlayer = 'B';}
+			nextTower = getNextTower(nxtTwrPos[0], nxtTwrPos[1], nextPlayer);
+		}
+		return nextTower;
 	}
 	
 	@SuppressWarnings("unchecked")

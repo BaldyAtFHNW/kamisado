@@ -1,7 +1,6 @@
 package kamisado_client;
 
 import java.util.Iterator;
-import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -9,7 +8,6 @@ import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 
 public class ClientController {
-	private Logger logger = Logger.getLogger("");
 	final private ClientModel model;
 	final private ClientView view;
 	
@@ -42,15 +40,17 @@ public class ClientController {
 	        	break;
 	        case "chat":			processChatMsg(json);
         		break;
+	        case "updateMove":		processUpdateMove(json);
+        		break;
 	        case "requestMove":		processRequestMove(json);
-	        	break;
+        		break;
 	        case "end":				processEnd(json);
 	    		break;
 	        case "restart":			processRestart(json);
     			break;
 	        case "leave":			processLeave();
     			break;
-	        default: 				logger.warning("Invalid Type");
+	        default: 				break;
 		}
 	}
 	
@@ -64,7 +64,6 @@ public class ClientController {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			logger.warning(e.toString());
 			e.printStackTrace();
 		}
 		
@@ -112,56 +111,46 @@ public class ClientController {
 		view.chatArea.appendText((String)json.get("msg") + br);
 	}
 	
+	private void processUpdateMove(JSONObject json) {
+		String tower = (String) json.get("towerColor");
+		Long x = (long) json.get("xPos");
+		Long y = (long) json.get("yPos");
+		int xPos = x.intValue();
+		int yPos = y.intValue();
+		if(model.black) { //this is the black client
+			xPos = model.turnUpsideDown(xPos);
+		}else {
+			yPos = model.turnUpsideDown(yPos);
+		}
+		
+		view.moveTower(tower, xPos, yPos);
+	}
+	
 	private void processRequestMove(JSONObject json){
-		boolean opponentBlocked = (boolean) json.get("opponentBlocked");
-		boolean playerBlocked = (boolean) json.get("playerBlocked");
-		
-		if(playerBlocked) {view.lastMoves.appendText("You are blocked.." + br);}
-		if(opponentBlocked) {view.lastMoves.appendText(model.opponentName + " is blocked!" + br);}
-		
-		//Display Opponent's move
-		if(!opponentBlocked) { 			//Only if other player was not blocked
-			String movedTower = (String) json.get("movedTower");
-			Long x = (long) json.get("xPos");
-			Long y = (long) json.get("yPos");
-			int newXPos = x.intValue();
-			int newYPos = y.intValue();
-			
-			if(model.black) { //this is the black client
-				newXPos = model.turnUpsideDown(newXPos);
-			}else {
-				newYPos = model.turnUpsideDown(newYPos);
-			}
-			view.moveTower(movedTower, newXPos, newYPos);
-		}
-		
 		//Display Possible Moves
-		if(!playerBlocked) {				//Only if this player himself is not blocked
-			String towerToMove = (String) json.get("nextTower");
-			JSONArray jsonArray = (JSONArray) json.get("possibleMoves");
-			@SuppressWarnings("unchecked")
-			Iterator<JSONObject> iterator = jsonArray.iterator();
-			while(iterator.hasNext()) {
-				JSONObject possibleMove = iterator.next();
-				Long possX = (long) possibleMove.get("xPos");
-				Long possY = (long) possibleMove.get("yPos");
-				int xPos = possX.intValue();
-				int yPos = possY.intValue();
-				if(model.black) { //this is the black client
-					xPos = model.turnUpsideDown(xPos);
-				}else {
-					yPos = model.turnUpsideDown(yPos);
-				}
-				view.showPossibleMove(towerToMove, xPos, yPos);
+		String towerToMove = (String) json.get("nextTower");
+		JSONArray jsonArray = (JSONArray) json.get("possibleMoves");
+		@SuppressWarnings("unchecked")
+		Iterator<JSONObject> iterator = jsonArray.iterator();
+		while(iterator.hasNext()) {
+			JSONObject possibleMove = iterator.next();
+			Long possX = (long) possibleMove.get("xPos");
+			Long possY = (long) possibleMove.get("yPos");
+			int xPos = possX.intValue();
+			int yPos = possY.intValue();
+			if(model.black) { //this is the black client
+				xPos = model.turnUpsideDown(xPos);
+			}else {
+				yPos = model.turnUpsideDown(yPos);
 			}
-			view.lastMoves.appendText("Your Turn!" + br);
+			view.showPossibleMove(towerToMove, xPos, yPos);
 		}
+		view.lastMoves.appendText("Your Turn!" + br);
 	}
 	
 	private void processEnd(JSONObject json){
 		boolean won = (boolean) json.get("won");
 		String reason = (String) json.get("reason");
-		logger.info("Process End - Reason = " + reason);
 		if(reason.equals("deadlock")) {
 			view.lastMoves.appendText("Deadlock...." + br);
 			view.showDeadlock();

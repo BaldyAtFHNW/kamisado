@@ -301,7 +301,7 @@ public class ClientView {
 				alert.setTitle("Kamisado by ShortyNBaldy - Client");
 				alert.setHeaderText("");
 				if(won) {
-					ImageView winner = new ImageView(new Image (getClass().getResourceAsStream("minions.jpg")));
+					ImageView winner = new ImageView(new Image (getClass().getResourceAsStream("/minions.jpg")));
 					alert.setGraphic(winner);
 					if(reason.equals("surrender")) {
 						alert.setContentText("You WON! Your opponent gave up.");
@@ -309,7 +309,7 @@ public class ClientView {
 						alert.setContentText("You WON! You reached the other side!");
 					}
 				}else {
-					ImageView loser = new ImageView(new Image (getClass().getResourceAsStream("sad_minion.jpg")));
+					ImageView loser = new ImageView(new Image (getClass().getResourceAsStream("/sad_minion.jpg")));
 					alert.setGraphic(loser);
 					if(reason.equals("surrender")) {
 						alert.setContentText("You gave up...");
@@ -329,7 +329,7 @@ public class ClientView {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Kamisado by ShortyNBaldy - Client");
 				alert.setHeaderText("");
-				ImageView loser = new ImageView(new Image (getClass().getResourceAsStream("sad_minion.jpg")));
+				ImageView loser = new ImageView(new Image (getClass().getResourceAsStream("/sad_minion.jpg")));
 				alert.setGraphic(loser);
 				alert.setContentText("You guys are both blocked.. That's a deadlock.");
 				alert.showAndWait();
