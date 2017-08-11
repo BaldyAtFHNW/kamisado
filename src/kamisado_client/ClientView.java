@@ -41,7 +41,7 @@ public class ClientView {
 	public Label opponentName;
 	public Label playerScore;
 	public Label opponentScore;
-	public Button giveUp;
+	public Button giveUpBtn;
 
 	final int FIELD_SIZE = 70;
 	final int STROKE_WIDTH = 10;
@@ -78,7 +78,7 @@ public class ClientView {
 				opponentName = new Label("");
 				playerScore = new Label("");
 				opponentScore = new Label("");
-				giveUp = new Button("Give Up");
+				giveUpBtn = new Button("Give Up");
 				
 				scoreBoard.add(scores, 0, 0);
 				scoreBoard.add(playerName, 0, 1);
@@ -108,10 +108,10 @@ public class ClientView {
 				chatBtn.setMaxWidth(80);
 				chatBtn.setMinWidth(80);
 				
-				giveUp.setTranslateX(220); 		//from: https://stackoverflow.com/questions/30641187/position-javafx-button-in-a-specific-location
-				giveUp.setTranslateY(45);
+				giveUpBtn.setTranslateX(220); 		//from: https://stackoverflow.com/questions/30641187/position-javafx-button-in-a-specific-location
+				giveUpBtn.setTranslateY(45);
 				
-				topRight.getChildren().addAll(scoreBoard, giveUp);
+				topRight.getChildren().addAll(scoreBoard, giveUpBtn);
 				chat.getChildren().addAll(chatTxt, chatBtn);
 				right.getChildren().addAll(topRight, lastMoves, chatArea, chat);
 				root.getChildren().addAll(gameBoard, right);

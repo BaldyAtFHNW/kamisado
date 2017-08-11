@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class ConnectGUI {
-	public Button connect;
+	public Button connectBtn;
 	public TextField txtName;
 	public TextField txtIP;
 	public Label connected;
@@ -29,7 +29,7 @@ public class ConnectGUI {
         imgView.setFitHeight(200);
         imgView.setFitWidth(600);
         
-		connect = new Button("Connect");
+		connectBtn = new Button("Connect");
 		
 		Label lblName = new Label("Your Name: ");
 		Label lblIP = new Label("Server's IP: ");
@@ -44,7 +44,7 @@ public class ConnectGUI {
 		grid.add(lblIP, 0, 1);
 		grid.add(txtName, 1, 0);
 		grid.add(txtIP, 1, 1);
-		grid.add(connect, 2, 1);
+		grid.add(connectBtn, 2, 1);
 		grid.add(connected, 3, 1);
 		
 		grid.setHgap(10);

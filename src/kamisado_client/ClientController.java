@@ -103,7 +103,7 @@ public class ClientController {
 			model.sendLeave();
 			view.stop();
 		});
-		view.giveUp.setOnAction((event)->{
+		view.giveUpBtn.setOnAction((event)->{
 			view.giveUp();
 		});
 	}
@@ -167,9 +167,9 @@ public class ClientController {
 			view.showDeadlock();
 		}else {
 			if(won) {
-				view.lastMoves.appendText("You WON!");
+				view.lastMoves.appendText("You WON!" + br);
 			}else {
-				view.lastMoves.appendText("You lost..");
+				view.lastMoves.appendText("You lost.." + br);
 			}
 			view.showEnd(won, reason);
 		}
@@ -190,7 +190,9 @@ public class ClientController {
 				
 				if(start) {
 					view.firstMove();
-					view.lastMoves.appendText("You have the first Move" + br);
+					view.lastMoves.appendText("You have the first move" + br);
+				}else {
+					view.lastMoves.appendText("Your opponent has got the first move" + br);
 				}
 			}
 		});

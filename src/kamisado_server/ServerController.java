@@ -208,7 +208,7 @@ public class ServerController{
 			e.printStackTrace();
 		}
 		
-		model.initGame(surrenderer);
+		model.restartGame(surrenderer);
 	}
 	
 	@SuppressWarnings("unchecked")

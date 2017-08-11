@@ -8,6 +8,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import kamisado_client.ClientController;
@@ -59,17 +60,34 @@ public class KamisadoMain extends Application{
 			srvView.start();
 		} else if (result.get() == startClient) {
 			connectGUI = new ConnectGUI(primaryStage);
-			connectGUI.connect.setOnAction((event) -> {startKamisadoClient(primaryStage);connectGUI.connect.setDisable(true);});
+			connectGUI.connectBtn.setOnAction((event) -> {startKamisadoClient(primaryStage);connectGUI.connectBtn.setDisable(true);});
 			connectGUI.txtName.setOnKeyPressed((event)->{
 				if (event.getCode() == KeyCode.ENTER)  {
 					startKamisadoClient(primaryStage);
-					connectGUI.connect.setDisable(true);
+					connectGUI.connectBtn.setDisable(true);
 		        }
+			});
+			connectGUI.txtName.setOnKeyPressed((event)->{
+				//Show if name is too long (Will later disturb GUI objects)
+				if(connectGUI.txtName.getText().length() >= 10) {
+					connectGUI.connectBtn.setDisable(true);
+					connectGUI.connected.setText("Name too long");
+					connectGUI.connected.setTextFill(Color.RED);
+				}else if(connectGUI.txtName.getText().length() == 0) {
+					connectGUI.connectBtn.setDisable(true);
+					connectGUI.connected.setText("Please choose a name");
+					connectGUI.connected.setTextFill(Color.RED);
+				}
+				else {
+					connectGUI.connectBtn.setDisable(false);
+					connectGUI.connected.setText("");
+					connectGUI.connected.setTextFill(Color.GREEN);
+				}
 			});
 			connectGUI.txtIP.setOnKeyPressed((event)->{
 				if (event.getCode() == KeyCode.ENTER)  {
 					startKamisadoClient(primaryStage);
-					connectGUI.connect.setDisable(true);
+					connectGUI.connectBtn.setDisable(true);
 		        }
 			});
 
